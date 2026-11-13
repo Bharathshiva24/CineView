@@ -1,0 +1,72 @@
+{
+  "manifest_version": 3,
+  "name": "CineView – See the screen from your seat",
+  "short_name": "CineView",
+  "version": "2.0.0",
+  "description": "Preview the cinema screen from the seat you picked on District or BookMyShow, with the movie’s own trailer playing on it.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "CineView – preview from my seat",
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://www.youtube.com/*",
+    "https://www.googleapis.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.district.in/*",
+        "*://district.in/*",
+        "*://*.bookmyshow.com/*"
+      ],
+      "js": [
+        "content/geometry.js",
+        "content/detector.js",
+        "content/overlay.js",
+        "content/main.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "commands": {
+    "toggle-preview": {
+      "suggested_key": {
+        "default": "Alt+Shift+S",
+        "mac": "Alt+Shift+S"
+      },
+      "description": "Open / close CineView"
+    }
+  },
+  "options_page": "options/options.html",
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "icons/*.png"
+      ],
+      "matches": [
+        "*://*.district.in/*",
+        "*://district.in/*",
+        "*://*.bookmyshow.com/*"
+      ]
+    }
+  ]
+}
