@@ -18,6 +18,9 @@
     search: '<svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6" stroke="currentColor" stroke-width="2" fill="none"/><path d="M15 15l4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
     gear: '<svg viewBox="0 0 24 24"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4z" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.5-2-3.4-2.3.9a7.5 7.5 0 0 0-2.6-1.5L14.1 2.6h-4.2l-.4 2.4a7.5 7.5 0 0 0-2.6 1.5l-2.3-.9-2 3.4 2 1.5a7.6 7.6 0 0 0 0 3l-2 1.5 2 3.4 2.3-.9a7.5 7.5 0 0 0 2.6 1.5l.4 2.4h4.2l.4-2.4a7.5 7.5 0 0 0 2.6-1.5l2.3.9 2-3.4-2-1.5z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></svg>',
     back: '<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>',
+    minus: '<svg viewBox="0 0 24 24"><path d="M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>',
+    fit: '<svg viewBox="0 0 24 24"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',
     check: '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>'
   };
 
@@ -83,6 +86,11 @@
   .capsule { position: absolute; left: 16px; top: 16px; display: flex; align-items: baseline; gap: 8px; padding: 8px 14px;
     border-radius: 999px; pointer-events: none; font-weight: 600; font-size: 13px; transition: opacity .4s ease; }
   .capsule span { font-weight: 400; color: rgba(235,235,245,.6); }
+  .fmtpill { position: absolute; right: 16px; top: 16px; padding: 8px 14px; border-radius: 999px; font-weight: 600; font-size: 13px; pointer-events: none;
+    transition: opacity .4s ease, transform .4s ${EASE}; }
+  .fmtpill span { font-weight: 400; color: rgba(235,235,245,.6); margin-left: 6px; }
+  .fmtpill.flash { transform: scale(1.06); }
+  .stage.idle .fmtpill:not(.flash) { opacity: 0; }
   .toast { position: absolute; left: 50%; top: 16px; transform: translate(-50%, -8px); opacity: 0; padding: 8px 14px; border-radius: 12px;
     font-weight: 500; pointer-events: none; transition: opacity .3s ease, transform .4s ${EASE}; max-width: 70%; text-align: center; }
   .toast.show { opacity: 1; transform: translate(-50%, 0); }
@@ -166,14 +174,31 @@
   .row .k { color: #f5f5f7; } .row .k small { display: block; color: rgba(235,235,245,.45); font-size: 11.5px; margin-top: 1px; }
   .row .v { font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
   .v.good { color: #30d158; } .v.mid { color: #ffd60a; } .v.bad { color: #ff9f0a; }
-  .map { position: relative; border-radius: 12px; background: rgba(118,118,128,.12); overflow: hidden; }
-  .map .s { position: absolute; border-radius: 2.5px; cursor: pointer; background: rgba(235,235,245,.28); transition: transform .2s ${EASE}, background .2s; }
-  .map .s.occupied { background: rgba(235,235,245,.09); }
-  .map .s.selected { background: #fff; }
-  .map .s.current { background: #ff2d2d; transform: scale(1.5); z-index: 2; box-shadow: 0 0 0 2px rgba(255,45,45,.3); }
-  .map .s:hover { transform: scale(1.6); background: #fff; z-index: 3; }
-  .map .scr { position: absolute; left: 18%; right: 18%; height: 3px; border-radius: 3px; background: rgba(235,235,245,.5); }
-  .map .scrl { position: absolute; left: 0; right: 0; text-align: center; font-size: 9px; font-weight: 600; letter-spacing: .25em; color: rgba(235,235,245,.35); }
+  .map { position: relative; border-radius: 12px; background: rgba(118,118,128,.12); overflow: hidden; touch-action: none; user-select: none; cursor: grab; }
+  .map.dragging { cursor: grabbing; }
+  .mapinner { position: absolute; left: 0; top: 0; width: 100%; height: 100%; transform-origin: 0 0; transition: transform .35s ${EASE}; }
+  .map.dragging .mapinner, .mapinner.instant { transition: none; }
+  .mapinner .s { position: absolute; border-radius: 22%; cursor: pointer; background: rgba(235,235,245,.28); transition: transform .2s ${EASE}, background .2s;
+    text-align: center; font-weight: 600; color: rgba(0,0,0,.72); font-variant-numeric: tabular-nums; overflow: hidden; }
+  .mapinner .s.occupied { background: rgba(235,235,245,.09); color: rgba(235,235,245,.35); }
+  .mapinner .s.selected { background: #fff; }
+  .mapinner .s.current { background: #ff2d2d; color: #fff; transform: scale(1.5); z-index: 2; box-shadow: 0 0 0 2px rgba(255,45,45,.3); }
+  .mapinner.zoomed .s.current { transform: scale(1.15); }
+  .mapinner .s:hover { transform: scale(1.6); background: #fff; color: #000; z-index: 3; }
+  .mapinner.zoomed .s:hover { transform: scale(1.2); }
+  .mapinner.labels .s::after { content: attr(data-n); }
+  .mapinner .scr { position: absolute; left: 18%; right: 18%; height: 3px; border-radius: 3px; background: rgba(235,235,245,.5); }
+  .mapinner .scrl { position: absolute; left: 0; right: 0; text-align: center; font-size: 9px; font-weight: 600; letter-spacing: .25em; color: rgba(235,235,245,.35); }
+  .maphead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .maphead .eyebrow { margin: 0; }
+  .mapctl { display: flex; border-radius: 8px; overflow: hidden; background: rgba(118,118,128,.24); }
+  .mapctl button { width: 28px; height: 24px; border: 0; background: transparent; color: #f5f5f7; padding: 5px 7px; cursor: pointer; transition: background .2s; }
+  .mapctl button:hover { background: rgba(255,255,255,.1); }
+  .mapctl button:disabled { color: rgba(235,235,245,.3); cursor: default; background: transparent; }
+  .mapctl button + button { border-left: .5px solid rgba(255,255,255,.12); }
+  .zoomlbl { position: absolute; left: 10px; bottom: 8px; z-index: 5; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 999px;
+    background: rgba(44,44,46,.94); color: rgba(235,235,245,.8); opacity: 0; transition: opacity .3s; pointer-events: none; font-variant-numeric: tabular-nums; }
+  .zoomlbl.show { opacity: 1; }
   .legend { display: flex; gap: 14px; margin-top: 8px; color: rgba(235,235,245,.5); font-size: 11.5px; }
   .legend span { display: flex; align-items: center; gap: 5px; } .legend i { width: 8px; height: 8px; border-radius: 2px; }
   .set { padding: 12px 14px; position: relative; }
@@ -213,6 +238,7 @@
           </div>
           <div class="vignette"></div>
           <div class="capsule glass"></div>
+          <div class="fmtpill glass"></div>
           <div class="toast glass"></div>
           <div class="menu glass"></div>
           <div class="player glass">
@@ -234,7 +260,6 @@
                   <form><input class="title" spellcheck="false" placeholder="Movie title"><button class="ib" type="submit" title="Find trailer">${ICON.search}</button></form>
                   <div class="src"><i class="dot"></i><span class="srctext"></span></div>
                 </section>
-                <section><div class="eyebrow">Screen format</div><div class="seg formatseg"></div></section>
                 <section class="seats"><div class="eyebrow">Your seats</div><div class="seg seatseg"></div></section>
                 <section>
                   <div class="score">
@@ -243,9 +268,11 @@
                     <div><div class="verdict"></div><div class="summary"></div></div>
                   </div>
                 </section>
-                <section><div class="eyebrow">From this seat</div><div class="list metrics"></div></section>
-                <section><div class="eyebrow">Seat map</div><div class="map"></div>
+                <section><div class="maphead"><div class="eyebrow">Seat map</div>
+                    <div class="mapctl"><button class="zout" title="Zoom out  (−)">${ICON.minus}</button><button class="zin" title="Zoom in  (+)">${ICON.plus}</button><button class="zfit" title="Fit whole hall  (0)">${ICON.fit}</button></div></div>
+                  <div class="map"><div class="mapinner"></div><div class="zoomlbl"></div></div>
                   <div class="legend"><span><i style="background:#ff2d2d"></i>Previewing</span><span><i style="background:#fff"></i>Selected</span><span><i style="background:rgba(235,235,245,.28)"></i>Available</span></div></section>
+                <section><div class="eyebrow">From this seat</div><div class="list metrics"></div></section>
               </div>
             </div>
             <div class="view prefs">
@@ -254,7 +281,7 @@
               <div class="scroll">
                 <div class="list setlist"></div>
                 <p class="foot">CineView estimates the hall from the seat map. Adjust these if you know the theatre – recliner halls usually have about 1.6 m between rows.<br><br>
-                  Click any seat on the map to compare. <kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd> move · <kbd>Space</kbd> play · <kbd>M</kbd> sound · <kbd>Esc</kbd> close.</p>
+                  Click any seat on the map to compare; pinch or <kbd>+</kbd> <kbd>−</kbd> to zoom, drag to pan. <kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd> move · <kbd>Space</kbd> play · <kbd>M</kbd> sound · <kbd>Esc</kbd> close.</p>
               </div>
             </div>
           </div>
@@ -265,7 +292,7 @@
     state.els = {
       backdrop: q('.backdrop'), stage: q('.stage'), camera: q('.camera'), env: q('.env'), rows: q('.rows'), screen: q('.screen'),
       capsule: q('.capsule'), toast: q('.toast'), menu: q('.menu'), play: q('.play'), mute: q('.mute'), trailerBtn: q('.trailer-btn'),
-      next: q('.next'), yt: q('.yt'), close: q('.x'), close2: q('.x2'), gear: q('.gear'), backbtn: q('.backbtn'), aside: q('aside'), formatseg: q('.formatseg'), form: q('.movie form'), title: q('.title'), dot: q('.dot'), srctext: q('.srctext'),
+      next: q('.next'), yt: q('.yt'), close: q('.x'), close2: q('.x2'), gear: q('.gear'), backbtn: q('.backbtn'), aside: q('aside'), fmtpill: q('.fmtpill'), mapinner: q('.mapinner'), zin: q('.zin'), zout: q('.zout'), zfit: q('.zfit'), zoomlbl: q('.zoomlbl'), form: q('.movie form'), title: q('.title'), dot: q('.dot'), srctext: q('.srctext'),
       seats: q('.seats'), seatseg: q('.seatseg'), arc: q('.arc'), num: q('.num'), verdict: q('.verdict'), summary: q('.summary'),
       metrics: q('.metrics'), map: q('.map'), setlist: q('.setlist')
     };
@@ -274,6 +301,7 @@
     const E = state.els;
     E.close.onclick = E.close2.onclick = () => CV.Overlay.close();
     E.gear.onclick = () => togglePrefs(true);
+    setupMapInteractions();
     E.backbtn.onclick = () => togglePrefs(false);
     E.backdrop.addEventListener('mousedown', (e) => { if (e.target === E.backdrop) CV.Overlay.close(); });
     E.play.onclick = togglePlay;
@@ -285,7 +313,7 @@
 
     // auto-hide the player controls while watching
     let idleT;
-    const wake = () => { E.stage.classList.remove('idle'); clearTimeout(idleT); idleT = setTimeout(() => { if (!E.menu.classList.contains('open')) E.stage.classList.add('idle'); }, 2600); };
+    const wake = state.wake = () => { E.stage.classList.remove('idle'); clearTimeout(idleT); idleT = setTimeout(() => { if (!E.menu.classList.contains('open')) E.stage.classList.add('idle'); }, 2600); };
     E.stage.addEventListener('mousemove', wake); E.stage.addEventListener('mouseleave', () => { clearTimeout(idleT); idleT = setTimeout(() => E.stage.classList.add('idle'), 900); });
     wake();
 
@@ -316,7 +344,7 @@
     const { cam, screen } = view;
     // Aim a little below the screen centre so the rows of seats ahead sit in the lower part of the view,
     // the way your eyes take them in at the cinema.
-    const aimY = screen.centerY - Math.min(Math.max(screen.h * 0.42, 1.2), 3.2);
+    const aimY = screen.centerY - Math.min(Math.max(screen.h * 0.3, 0.9), 1.9);
     const dx = 0 - cam.x, dy = -(aimY - cam.y), dz = 0 - cam.z;
     const yaw = Math.atan2(dx, -dz);
     const dz2 = -dx * Math.sin(yaw) + dz * Math.cos(yaw);
@@ -418,6 +446,8 @@
     E.num.textContent = m.score;
     E.verdict.textContent = m.verdict;
     E.summary.textContent = m.headline;
+    const fm = view.screen.format;
+    E.fmtpill.innerHTML = `${esc(fm.name)}<span>${ratioText(fm)} · ${view.screen.w.toFixed(1)} × ${view.screen.h.toFixed(1)} m</span>`;
     E.capsule.innerHTML = `${esc(seatName(seat))}${seat.status === 'occupied' ? ' · booked' : ''}<span>${m.distance.toFixed(1)} m from screen</span>`;
 
     const fill = m.hAngle >= 33 && m.hAngle <= 46 ? 'good' : m.hAngle >= 26 && m.hAngle <= 56 ? 'mid' : 'bad';
@@ -441,43 +471,146 @@
     renderMap();
   }
 
+  // ---------- Seat map with zoom / pan ----------
+  const MAP_MAX_ZOOM = 6;
   function renderMap() {
-    const E = state.els, L = state.layout, map = E.map;
+    const E = state.els, L = state.layout, map = E.map, inner = E.mapinner;
     const width = map.clientWidth || 300;
     const pad = 14, band = 26;
     const spanX = L.maxX - L.minX + L.seatW, spanY = L.maxY - L.minY + L.seatH;
-    const k = Math.min((width - pad * 2) / spanX, 190 / spanY, 9 / Math.max(L.seatW, 1));
-    map.style.height = spanY * k + pad * 2 + band + 'px';
-    map.textContent = '';
+    const k = Math.min((width - pad * 2) / spanX, 200 / spanY, 9 / Math.max(L.seatW, 1));
+    map.style.height = Math.max(120, spanY * k + pad * 2 + band) + 'px';
+    inner.textContent = '';
     const top = L.screenSide === 'bottom' ? pad : pad + band;
     const offX = (width - spanX * k) / 2;
     const w = Math.max(3, L.seatW * k * 0.78);
+    state.mapSeatPx = w;
     const frag = document.createDocumentFragment();
     for (const seat of L.seats) {
       const d = h('div', 's ' + seat.status + (seat === state.seat ? ' current' : ''));
       d.style.width = d.style.height = w + 'px';
-      d.style.left = offX + (seat.cx - L.minX + L.seatW / 2) * k - w / 2 + 'px';
-      d.style.top = top + (seat.cy - L.minY + L.seatH / 2) * k - w / 2 + 'px';
+      d.style.lineHeight = w + 'px';
+      d.style.fontSize = w * 0.5 + 'px';
+      const left = offX + (seat.cx - L.minX + L.seatW / 2) * k - w / 2;
+      const tp = top + (seat.cy - L.minY + L.seatH / 2) * k - w / 2;
+      d.style.left = left + 'px';
+      d.style.top = tp + 'px';
+      d.dataset.n = seat.label || '';
       d.title = seatName(seat) + (seat.status === 'occupied' ? ' (booked)' : '');
-      d.onclick = () => setSeat(seat);
+      d.onclick = (e) => { if (state.mapDragged) { e.stopPropagation(); return; } setSeat(seat); };
+      if (seat === state.seat) state.mapCurrentPos = { x: left + w / 2, y: tp + w / 2 };
       frag.appendChild(d);
     }
     const bar = h('div', 'scr'), lbl = h('div', 'scrl', 'SCREEN');
     if (L.screenSide === 'bottom') { bar.style.bottom = '20px'; lbl.style.bottom = '6px'; } else { bar.style.top = '8px'; lbl.style.top = '14px'; }
     frag.append(bar, lbl);
-    map.appendChild(frag);
+    inner.appendChild(frag);
+    keepCurrentSeatVisible();
+    applyMap(true);
   }
 
+  function clampMap() {
+    const v = state.mapView, map = state.els.map;
+    const W = map.clientWidth, H = map.clientHeight;
+    v.k = Math.max(1, Math.min(MAP_MAX_ZOOM, v.k));
+    v.x = Math.min(0, Math.max(W - W * v.k, v.x));
+    v.y = Math.min(0, Math.max(H - H * v.k, v.y));
+  }
+
+  function applyMap(instant) {
+    const E = state.els, v = state.mapView;
+    clampMap();
+    E.mapinner.classList.toggle('instant', !!instant);
+    E.mapinner.style.transform = `translate(${v.x}px, ${v.y}px) scale(${v.k})`;
+    E.mapinner.classList.toggle('zoomed', v.k > 1.05);
+    E.mapinner.classList.toggle('labels', (state.mapSeatPx || 6) * v.k >= 15);
+    E.zin.disabled = v.k >= MAP_MAX_ZOOM - 0.01;
+    E.zout.disabled = E.zfit.disabled = v.k <= 1.01;
+    E.map.style.cursor = v.k > 1.01 ? '' : 'default';
+  }
+
+  function zoomMap(factor, cx, cy) {
+    const v = state.mapView, map = state.els.map;
+    if (cx == null) {
+      // zoom around the previewed seat when using the buttons
+      const p = state.mapCurrentPos;
+      cx = p ? v.x + p.x * v.k : map.clientWidth / 2;
+      cy = p ? v.y + p.y * v.k : map.clientHeight / 2;
+    }
+    const nk = Math.max(1, Math.min(MAP_MAX_ZOOM, v.k * factor));
+    v.x = cx - ((cx - v.x) * nk) / v.k;
+    v.y = cy - ((cy - v.y) * nk) / v.k;
+    v.k = nk;
+    applyMap(false);
+    const l = state.els.zoomlbl;
+    l.textContent = `${Math.round(nk * 100)}%`; l.classList.add('show');
+    clearTimeout(zoomMap.t); zoomMap.t = setTimeout(() => l.classList.remove('show'), 900);
+  }
+
+  function keepCurrentSeatVisible() {
+    const v = state.mapView, p = state.mapCurrentPos, map = state.els.map;
+    if (!p || v.k <= 1.01) return;
+    const sx = v.x + p.x * v.k, sy = v.y + p.y * v.k, m = 24;
+    if (sx < m) v.x += m - sx; else if (sx > map.clientWidth - m) v.x -= sx - (map.clientWidth - m);
+    if (sy < m) v.y += m - sy; else if (sy > map.clientHeight - m) v.y -= sy - (map.clientHeight - m);
+  }
+
+  function setupMapInteractions() {
+    const E = state.els, map = E.map;
+    state.mapView = { k: 1, x: 0, y: 0 };
+    E.zin.onclick = (e) => { e.stopPropagation(); zoomMap(1.6); };
+    E.zout.onclick = (e) => { e.stopPropagation(); zoomMap(1 / 1.6); };
+    E.zfit.onclick = (e) => { e.stopPropagation(); Object.assign(state.mapView, { k: 1, x: 0, y: 0 }); applyMap(false); };
+    for (const b of [E.zin, E.zout, E.zfit]) b.addEventListener('pointerdown', (e) => e.stopPropagation());
+
+    let drag = null;
+    map.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
+      drag = { sx: e.clientX, sy: e.clientY, x0: state.mapView.x, y0: state.mapView.y, moved: false, id: e.pointerId };
+      state.mapDragged = false;
+    });
+    map.addEventListener('pointermove', (e) => {
+      if (!drag || state.mapView.k <= 1.01) return;
+      const dx = e.clientX - drag.sx, dy = e.clientY - drag.sy;
+      if (!drag.moved && Math.hypot(dx, dy) > 4) { drag.moved = true; map.classList.add('dragging'); try { map.setPointerCapture(drag.id); } catch (_) {} }
+      if (drag.moved) { state.mapView.x = drag.x0 + dx; state.mapView.y = drag.y0 + dy; applyMap(true); }
+    });
+    const end = () => {
+      if (drag && drag.moved) { state.mapDragged = true; setTimeout(() => { state.mapDragged = false; }, 0); }
+      drag = null; map.classList.remove('dragging');
+    };
+    map.addEventListener('pointerup', end);
+    map.addEventListener('pointercancel', end);
+    // Trackpad pinch / ctrl+wheel zooms; two-finger scroll pans once zoomed
+    map.addEventListener('wheel', (e) => {
+      const r = map.getBoundingClientRect();
+      if (e.ctrlKey || e.metaKey) { e.preventDefault(); zoomMap(Math.exp(-e.deltaY * 0.01), e.clientX - r.left, e.clientY - r.top); }
+      else if (state.mapView.k > 1.01) { e.preventDefault(); state.mapView.x -= e.deltaX; state.mapView.y -= e.deltaY; applyMap(true); }
+    }, { passive: false });
+    map.addEventListener('dblclick', (e) => { const r = map.getBoundingClientRect(); zoomMap(2, e.clientX - r.left, e.clientY - r.top); });
+  }
+
+  const ratioText = (f) => (f.id === 'hd' ? '16:9' : f.ratio.toFixed(2) + ':1');
   function renderFormats() {
     const seg = state.els.formatseg;
+    if (!seg) return;
     seg.textContent = '';
     const cur = CV.formatFor(state.settings.aspect);
     for (const f of CV.FORMATS) {
       const b = h('button', f === cur ? 'on' : '', `${f.label}<small>${f.id === 'hd' ? '1.78:1' : f.ratio.toFixed(2) + ':1'}</small>`);
       b.type = 'button'; b.title = f.name;
-      b.onclick = () => { state.settings.aspect = f.ratio; renderFormats(); render(false); };
+      b.onclick = () => setFormat(f);
       seg.appendChild(b);
     }
+  }
+
+  function setFormat(f) {
+    state.settings.aspect = f.ratio;
+    renderSettings();
+    render(false);
+    const pill = state.els.fmtpill;
+    pill.classList.add('flash'); if (state.wake) state.wake();
+    clearTimeout(setFormat.t); setFormat.t = setTimeout(() => pill.classList.remove('flash'), 1400);
   }
 
   function togglePrefs(open) { state.els.aside.classList.toggle('show-prefs', open); }
@@ -505,6 +638,11 @@
   function renderSettings() {
     const list = state.els.setlist, s = state.settings;
     list.textContent = '';
+    const fmt = h('div', 'set', '<header><span>Screen format</span><span></span></header>');
+    const fseg = h('div', 'seg');
+    fmt.appendChild(fseg); list.appendChild(fmt);
+    state.els.formatseg = fseg; renderFormats();
+    fmt.querySelector('header span:last-child').textContent = CV.formatFor(s.aspect).name;
     const fit = h('div', 'set', '<header><span>Trailer on screen</span><span></span></header>');
     const seg = h('div', 'seg');
     for (const [v, t] of [['cover', 'Fill screen'], ['fit', 'Show full frame']]) {
@@ -658,6 +796,9 @@
     if (map[e.key]) { e.preventDefault(); e.stopPropagation(); moveSeat(...map[e.key]); }
     else if (e.key === ' ') { e.preventDefault(); e.stopPropagation(); togglePlay(); }
     else if (e.key === 'm' || e.key === 'M') { e.preventDefault(); toggleMute(); }
+    else if (e.key === '+' || e.key === '=') { e.preventDefault(); zoomMap(1.6); }
+    else if (e.key === '-' || e.key === '_') { e.preventDefault(); zoomMap(1 / 1.6); }
+    else if (e.key === '0') { e.preventDefault(); Object.assign(state.mapView, { k: 1, x: 0, y: 0 }); applyMap(false); }
   }
 
   CV.Overlay = {
@@ -673,7 +814,7 @@
       document.documentElement.appendChild(build());
       window.addEventListener('message', onYtMessage);
       window.addEventListener('keydown', onKey, true);
-      renderSettings(); renderFormats(); syncButtons(); renderMenu();
+      renderSettings(); syncButtons(); renderMenu();
       requestAnimationFrame(() => render(true));
       if (ctx.message) setTimeout(() => toast(ctx.message, 6000), 500);
       loadTrailers(ctx.title || '', ctx.hints || null);

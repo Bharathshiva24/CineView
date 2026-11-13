@@ -27,7 +27,7 @@
   // Cinema screen formats. Width is the hall's screen wall; height follows the format's aspect ratio.
   CV.FORMATS = [
     { id: 'scope', label: 'Scope', name: 'CinemaScope', ratio: 2.39 },
-    { id: 'imax', label: 'IMAX', name: 'IMAX', ratio: 1.9, scale: 1.08 },
+    { id: 'imax', label: 'IMAX', name: 'IMAX', ratio: 1.9, scale: 1.18, bottom: 0.7 }, // wall-to-wall, floor-to-ceiling
     { id: 'flat', label: 'Flat', name: 'Widescreen', ratio: 1.85 },
     { id: 'hd', label: '16:9', name: 'Standard 16:9', ratio: 16 / 9 }
   ];
@@ -42,8 +42,8 @@
   CV.screenSize = function (layout, s) {
     const hall = CV.hallWidth(layout, s);
     const f = CV.formatFor(s.aspect);
-    const w = Math.min(CV.baseScreenWidth(layout, s) * (f.scale || 1), hall - 0.6);
-    return { w, h: w / f.ratio, hall, format: f };
+    const w = Math.min(CV.baseScreenWidth(layout, s) * (f.scale || 1), hall - 0.3);
+    return { w, h: w / f.ratio, hall, format: f, bottom: f.bottom != null ? f.bottom : s.screenBottom };
   };
 
   // Distance from the screen to the first row (auto: cinema design guides put it at ~0.6× screen width)
@@ -68,7 +68,7 @@
   CV.computeView = function (seat, layout, s) {
     const cam = CV.seatPosition(seat, layout, s);
     const scr = CV.screenSize(layout, s);
-    const screenCenterY = s.screenBottom + scr.h / 2;
+    const screenCenterY = scr.bottom + scr.h / 2;
 
     const dz = cam.z;
     const hAngle = deg(Math.atan((scr.w / 2 - cam.x) / dz) + Math.atan((scr.w / 2 + cam.x) / dz));
@@ -121,7 +121,7 @@
     else verdict = 'Limited view';
 
     return {
-      cam, screen: { w: scr.w, h: scr.h, centerY: screenCenterY, bottom: s.screenBottom, format: scr.format }, hall: scr.hall,
+      cam, screen: { w: scr.w, h: scr.h, centerY: screenCenterY, bottom: scr.bottom, format: scr.format }, hall: scr.hall,
       metrics: { hAngle, vAngle, offAxis, widths, distance: dz, score, verdict, notes, sound, soundShort, headline, backFraction }
     };
   };

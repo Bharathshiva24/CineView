@@ -135,6 +135,40 @@
     return [...ids.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([id]) => id);
   }
 
+  function formatFromText(t) {
+    if (/\bimax\b/i.test(t)) return 1.9;
+    if (/\b(cinemascope|scope)\b/i.test(t)) return 2.39;
+    if (/\b(flat|1\.85)\b/i.test(t)) return 1.85;
+    return null;
+  }
+
+  // Find the showtime chip whose time matches the selected show and read its label/caption (e.g. "IMAX 3D")
+  function detectFormat(showLine) {
+    const m = (showLine || '').match(/(\d{1,2}:\d{2})\s?(am|pm)/i);
+    if (!m) return null;
+    const want = (m[1] + ' ' + m[2]).toLowerCase().replace(/^0/, '');
+    const norm = (t) => t.toLowerCase().replace(/\s+/g, ' ').replace(/(\d)(am|pm)/, '$1 $2').replace(/^0/, '').trim();
+    for (const el of document.body.querySelectorAll('*')) {
+      if (el.children.length > 0 || el.closest('#cineview-root,script,style')) continue;
+      const raw = el.textContent || '';
+      if (raw.length > 12 || norm(raw) !== want) continue;
+      const r = el.getBoundingClientRect();
+      if (!r.width || r.top > 700) continue;
+      // climb to the chip + its caption (stay small so we don't read the whole showtime strip)
+      let node = el, text = '';
+      for (let i = 0; i < 4 && node; i++) {
+        const t = (node.innerText || '').replace(/\s+/g, ' ').trim();
+        if (t.length > 40) break;
+        text = t;
+        node = node.parentElement;
+      }
+      const f = formatFromText(text);
+      if (f) return f;
+      if (text) return 2.39; // matched the chip and it isn't IMAX → standard scope house
+    }
+    return null;
+  }
+
   async function remembered() {
     try {
       const { lastMovie } = await chrome.storage.local.get('lastMovie');
@@ -162,12 +196,8 @@
       lang = lang || mem.lang || '';
       ids = [...new Set([...(mem.ids || []), ...ids])];
     }
-    // Screen format from the show line / header (e.g. "IMAX 2D", "4K Laser Dolby Atmos")
-    const fmtText = nearText + ' ' + ((document.querySelector('header') || {}).innerText || '');
-    let format = null;
-    if (/\bimax\b/i.test(fmtText)) format = 1.9;
-    else if (/\b(scope|cinemascope)\b/i.test(fmtText)) format = 2.39;
-    else if (/\b(flat|1\.85)\b/i.test(fmtText)) format = 1.85;
+    // Screen format: the showtime chip matching the selected show ("10:30 PM · IMAX 3D"), then the header
+    const format = detectFormat(headScope) || formatFromText(nearText + ' ' + ((document.querySelector('header') || {}).innerText || ''));
     return { title, lang, ids, format };
   }
   CV.detectMovie = detectMovie;

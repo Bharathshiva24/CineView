@@ -17,9 +17,9 @@ Seat maps are flat grids. They don't show how big the screen will look, whether 
   1. Trailer links on District / BookMyShow are used first, after checking that the video title matches the movie.
   2. Otherwise it searches YouTube and accepts only videos whose title contains the movie name and the word *trailer* or *teaser*. Reactions, reviews, songs and game trailers are filtered out.
   3. If nothing matches, it says so instead of playing an unrelated video.
-- **Real cinema formats.** Switch between **CinemaScope 2.39:1**, **IMAX 1.90:1**, **Flat 1.85:1** and **16:9**, and the screen resizes to match. IMAX is picked automatically when the show is listed as IMAX.
+- **Real cinema formats.** CinemaScope 2.39:1, IMAX 1.90:1, Flat 1.85:1 and 16:9. The format comes from the showtime you picked (for example "10:30 PM · IMAX 3D"), and you can change it under Settings. The screen animates to the new shape. IMAX gets a larger, wall-to-wall screen that starts close to the floor.
 - **Seat score and viewing stats.** A 0–100 score based on how much of your view the screen fills (THX recommends about 36–40°), neck angle, off-centre angle, distance in screen widths, and where the sound is best.
-- **Compare seats instantly.** Click any seat on the mini map or use the arrow keys, and the camera glides to it.
+- **Zoomable seat map.** Zoom in and out with the − / + buttons, pinch on a trackpad, or press + / −. Drag or two-finger scroll to pan. Seat numbers appear once you're zoomed in. Click any seat to preview it, or use the arrow keys.
 - **Calibration grid.** A test pattern that makes keystone (off-centre) distortion easy to see.
 - **Follows the page.** Switch movie or showtime with the preview open and it picks up the new movie and loads its trailer.
 
@@ -33,9 +33,13 @@ Seat maps are flat grids. They don't show how big the screen will look, whether 
 |---|---|
 | ![Front side seat](docs/screenshots/preview-front-side.png) | ![Settings](docs/screenshots/settings.png) |
 
-| Seat layout (demo page) | Toolbar popup |
+| Zoomed seat map | Seat layout (demo page) |
 |---|---|
-| ![Seat layout](docs/screenshots/seat-layout.png) | <img src="docs/screenshots/popup.png" width="300" alt="Popup"> |
+| ![Seat map zoom](docs/screenshots/seat-map-zoom.png) | ![Seat layout](docs/screenshots/seat-layout.png) |
+
+| Toolbar popup | |
+|---|---|
+| <img src="docs/screenshots/popup.png" width="300" alt="Popup"> | |
 
 > The screenshots show the calibration grid. In a real booking, the movie's trailer plays on the screen.
 
@@ -50,7 +54,7 @@ Seat maps are flat grids. They don't show how big the screen will look, whether 
 
 1. Open a movie on **District** or **BookMyShow**, choose a showtime and select your seats.
 2. Click the CineView icon, or press **⌥ Shift S** (Alt+Shift+S).
-3. Keyboard: **← → ↑ ↓** move between seats · **Space** play/pause · **M** sound · **Esc** close.
+3. Keyboard: **← → ↑ ↓** move between seats · **+ / − / 0** zoom the seat map · **Space** play/pause · **M** sound · **Esc** close.
 
 No booking page handy? Open the popup and choose **Try the demo theatre**.
 
@@ -66,7 +70,7 @@ No booking page handy? Open the popup and choose **Try the demo theatre**.
 
 ## Settings
 
-The gear icon next to Close opens **Theatre** settings: screen width, first-row distance, row spacing, stadium step, field of view, and whether the trailer fills the screen or shows the full frame. These are saved. The **Options** page has an optional YouTube Data API key and a reset button.
+The gear icon next to Close opens **Theatre** settings: screen format, screen width, first-row distance, row spacing, stadium step, field of view, and whether the trailer fills the screen or shows the full frame. These are saved. The **Options** page has an optional YouTube Data API key and a reset button.
 
 ## Privacy
 
