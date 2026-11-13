@@ -3,6 +3,10 @@
 All notable changes to CineView. Versions follow [Semantic Versioning](https://semver.org): **MAJOR.MINOR.PATCH**.
 Every version is archived as a ready-to-load zip in [`releases/`](releases/) and tagged in git (`vX.Y.Z`).
 
+## v2.4.0 — 2026-11-14
+- New app icon: the red concave screen on a white disk, used for the toolbar icon and site favicon (SVG, ICO, PNG and Apple touch icon).
+- **CineView website** in `website/`: landing page, how it works, interactive screen-format demo, install guide with a direct download, and FAQ. It's a static site ready for Vercel, with a self-hosted Archivo font.
+
 ## v2.3.0 — 2026-11-14
 - **Screen format dropdown** at the top right of the preview, showing *where* the format was detected (showtime chip, cinema name or header) with an **Auto** badge; pick any format manually and the screen animates to it.
 - Better format detection: reads the selected showtime chip and its caption (for example "10:30 PM · IMAX 3D") and IMAX in the cinema or screen name, and updates when you switch shows while the preview is open.

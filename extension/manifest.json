@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "CineView – See the screen from your seat",
   "short_name": "CineView",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "Preview the cinema screen from the seat you picked on District or BookMyShow, with the movie’s own trailer playing on it.",
   "icons": {
     "16": "icons/icon16.png",

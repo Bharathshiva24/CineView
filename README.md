@@ -7,7 +7,7 @@
 <p align="center"><img src="docs/screenshots/trailer-preview.png" alt="CineView on District: Ramayana teaser playing on the cinema screen, seen from the selected seat"></p>
 <p align="center"><sub>A real booking on District, with the movie's official teaser playing on the screen as seen from the selected seat.</sub></p>
 
-<p align="center"><b>Current version: v2.3.0</b> · <a href="CHANGELOG.md">Changelog</a> · <a href="releases/">All versions</a></p>
+<p align="center"><b>Current version: v2.4.0</b> · <a href="CHANGELOG.md">Changelog</a> · <a href="releases/">All versions</a></p>
 
 ## Why
 
@@ -48,9 +48,9 @@ Seat maps are flat grids. They don't show how big the screen will look, whether 
 
 ## Install
 
-1. Download the latest zip from [`releases/`](releases/) (`cineview-v2.3.0.zip`) and unzip it. Or clone the repo: `git clone https://github.com/Bharathshiva24/CineView.git`.
+1. Download the latest zip from [`releases/`](releases/) (`cineview-v2.4.0.zip`) and unzip it. Or clone the repo: `git clone https://github.com/Bharathshiva24/CineView.git`.
 2. Open `chrome://extensions` and turn on **Developer mode**.
-3. Click **Load unpacked** and choose the folder that contains `manifest.json`: the unzipped `cineview-v2.3.0` folder, or `extension/` in a clone.
+3. Click **Load unpacked** and choose the folder that contains `manifest.json`: the unzipped `cineview-v2.4.0` folder, or `extension/` in a clone.
 4. Pin **CineView** to the toolbar.
 
 ## Use
@@ -97,14 +97,16 @@ cineview/
 │   ├── options/             settings page
 │   ├── demo/                District-style mock seat map for testing
 │   └── icons/               toolbar icons + wordmark
+├── website/              ← cineview landing page (static, deployed on Vercel)
 ├── releases/             ← every version archived as a ready-to-load zip
-│   ├── cineview-v2.3.0.zip  (latest)
+│   ├── cineview-v2.4.0.zip  (latest)
+│   ├── cineview-v2.3.0.zip
 │   ├── cineview-v2.2.0.zip
 │   ├── cineview-v2.1.0.zip
 │   ├── cineview-v2.0.0.zip
 │   └── seatview-v1.0.0.zip  (original prototype)
 ├── docs/
-│   ├── logo/                wordmark + app icon
+│   ├── logo/                wordmark + app icon (PNG + SVG)
 │   └── screenshots/
 ├── CHANGELOG.md          ← what changed in each version
 ├── VERSION               ← current version number

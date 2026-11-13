@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CineView – See the screen from your seat</title>
+  <meta name="description" content="CineView is a free Chrome extension for District and BookMyShow. Pick a seat and see the cinema screen from it, with the movie's trailer playing, before you book.">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+  <meta property="og:title" content="CineView – See the screen from your seat">
+  <meta property="og:description" content="Preview the cinema screen from the seat you picked on District or BookMyShow, with the trailer playing.">
+  <meta property="og:image" content="/assets/og.jpg">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preload" href="/fonts/archivo-var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="nav">
+    <a class="brand" href="/" aria-label="CineView home">
+      <img src="/favicon.svg" alt="" width="28" height="28">
+      <span>CineView</span>
+    </a>
+    <nav aria-label="Main">
+      <a href="#how">How it works</a>
+      <a href="#formats">Formats</a>
+      <a href="#install">Install</a>
+    </nav>
+    <a class="btn btn-red btn-sm" href="#install">Download</a>
+  </header>
+
+  <main id="main">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-copy">
+        <h1>See the screen from your seat.</h1>
+        <p class="lede">CineView is a free Chrome extension for District and BookMyShow. Pick a seat, click CineView, and watch the movie's trailer on the screen exactly as you'd see it from that row.</p>
+        <div class="actions">
+          <a class="btn btn-red" href="/downloads/cineview-v2.4.0.zip" download data-download>Download for Chrome</a>
+          <a class="btn btn-ghost" href="https://github.com/Bharathshiva24/CineView" target="_blank" rel="noopener">View source on GitHub</a>
+        </div>
+        <p class="fine">Version 2.4.0. Free and open source. Works in Chrome, Edge, Brave and Arc.</p>
+      </div>
+      <figure class="hero-screen">
+        <div class="curve">
+          <img src="/assets/preview-trailer.jpg" alt="CineView on District: the Ramayana teaser playing on the cinema screen, seen from the selected seat, with the seat score and seat map beside it" width="1800" height="998">
+        </div>
+        <figcaption>A real booking on District: row F, 10.3 m from the screen, scored 97.</figcaption>
+      </figure>
+    </section>
+
+    <!-- How it works (a real sequence) -->
+    <section class="how" id="how" aria-labelledby="how-title">
+      <h2 id="how-title">Three clicks between you and a better seat.</h2>
+      <ol class="steps">
+        <li>
+          <span class="n" aria-hidden="true">1</span>
+          <h3>Choose seats as usual</h3>
+          <p>Open a movie on District or BookMyShow, pick a showtime and select your seats. CineView reads the seat map and works out where each seat sits in the hall.</p>
+        </li>
+        <li>
+          <span class="n" aria-hidden="true">2</span>
+          <h3>Click CineView</h3>
+          <p>Click the toolbar icon or press <kbd>⌥</kbd><kbd>⇧</kbd><kbd>S</kbd>. A 3D hall opens from your seat's eye height, rows in front of you included.</p>
+        </li>
+        <li>
+          <span class="n" aria-hidden="true">3</span>
+          <h3>Watch the trailer from there</h3>
+          <p>The movie's official trailer plays on the screen. Compare seats on the map, check the score, then go back and book.</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- Features as alternating rows -->
+    <section class="features" aria-label="Features">
+      <article class="feature">
+        <div class="feature-copy">
+          <h2>Know before you book.</h2>
+          <p>Every seat gets a score out of 100 and four plain numbers: how much of your view the screen fills, distance in screen widths, neck angle and how far off-centre you are. Industry guidance puts the sweet spot at about 36–40° of your view; CineView tells you where you land.</p>
+          <ul class="ticks">
+            <li>Green, yellow or orange for each number, so you can scan it in a second</li>
+            <li>Sound balance from your position in the hall</li>
+          </ul>
+        </div>
+        <img class="shot" src="/assets/front-side.jpg" alt="Front-row, far-side seat: the screen appears skewed and the score is low" width="1400" height="836" loading="lazy">
+      </article>
+
+      <article class="feature flip">
+        <div class="feature-copy">
+          <h2>Compare every seat in seconds.</h2>
+          <p>The seat map in CineView mirrors the one you booked from. Click any seat, or use the arrow keys, and the camera glides there. Zoom in to read seat numbers and drag to move around large halls.</p>
+          <ul class="ticks">
+            <li>Booked seats are dimmed, your picks are highlighted</li>
+            <li>Pinch, the + and − buttons, or keys + and − to zoom</li>
+          </ul>
+        </div>
+        <img class="shot" src="/assets/seat-map.jpg" alt="Zoomed seat map with seat numbers and the previewed seat in red" width="1400" height="836" loading="lazy">
+      </article>
+    </section>
+
+    <!-- Formats: interactive -->
+    <section class="formats" id="formats" aria-labelledby="formats-title">
+      <div class="formats-head">
+        <h2 id="formats-title">IMAX is not just a bigger Scope screen.</h2>
+        <p>CineView detects the format from the showtime you pick, such as "10:30 PM · IMAX 3D", and draws the screen at its real proportions. Try them here.</p>
+      </div>
+      <div class="format-stage">
+        <div class="format-screen" data-ratio="2.39">
+          <img src="/assets/film.jpg" alt="" width="1140" height="479" loading="lazy">
+        </div>
+      </div>
+      <div class="format-picker" role="radiogroup" aria-label="Screen format">
+        <button role="radio" aria-checked="true" data-ratio="2.39" data-scale="1"><b>CinemaScope</b><span>2.39 : 1</span></button>
+        <button role="radio" aria-checked="false" data-ratio="1.90" data-scale="1.18"><b>IMAX</b><span>1.90 : 1</span></button>
+        <button role="radio" aria-checked="false" data-ratio="1.85" data-scale="1"><b>Widescreen</b><span>1.85 : 1</span></button>
+        <button role="radio" aria-checked="false" data-ratio="1.78" data-scale="1"><b>Standard</b><span>16 : 9</span></button>
+      </div>
+    </section>
+
+    <!-- Install (dark: house lights down) -->
+    <section class="install" id="install" aria-labelledby="install-title">
+      <div class="install-inner">
+        <div class="install-head">
+          <h2 id="install-title">Install CineView in under a minute.</h2>
+          <p>CineView isn't on the Chrome Web Store yet, so you add it as an unpacked extension. It stays installed after you restart Chrome.</p>
+          <a class="btn btn-red btn-lg" href="/downloads/cineview-v2.4.0.zip" download data-download>Download CineView 2.4.0</a>
+          <p class="fine">430 KB zip for Chrome, Edge, Brave and Arc.</p>
+        </div>
+        <ol class="install-steps">
+          <li>
+            <h3>Unzip the download</h3>
+            <p>Double-click <code>cineview-v2.4.0.zip</code>. You'll get a folder named <code>cineview-v2.4.0</code>. Keep it somewhere it won't be deleted.</p>
+          </li>
+          <li>
+            <h3>Open the extensions page</h3>
+            <p>Paste this into Chrome's address bar. Browsers don't let websites open it directly.</p>
+            <div class="copy">
+              <code id="ext-url">chrome://extensions</code>
+              <button type="button" class="btn btn-small" data-copy="#ext-url">Copy</button>
+            </div>
+          </li>
+          <li>
+            <h3>Turn on Developer mode</h3>
+            <p>Use the switch in the top-right corner of the extensions page.</p>
+          </li>
+          <li>
+            <h3>Load the folder</h3>
+            <p>Click <b>Load unpacked</b> and choose the <code>cineview-v2.4.0</code> folder. Pin CineView from the puzzle-piece menu so it's one click away.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq" aria-labelledby="faq-title">
+      <h2 id="faq-title">Questions</h2>
+      <details>
+        <summary>Is it free?</summary>
+        <p>Yes. CineView is free and its code is public on GitHub.</p>
+      </details>
+      <details>
+        <summary>Does it collect my data?</summary>
+        <p>No. It runs in your browser, reads only the District or BookMyShow page you're on, and talks only to YouTube to find and play the trailer. There are no accounts, analytics or servers.</p>
+      </details>
+      <details>
+        <summary>Which trailer does it play?</summary>
+        <p>The one District or BookMyShow lists for the movie. If there isn't one, CineView searches YouTube and only accepts videos titled with the movie's name and "trailer" or "teaser". Reactions, reviews and songs are filtered out, and if nothing matches it tells you instead of guessing.</p>
+      </details>
+      <details>
+        <summary>How accurate is the view?</summary>
+        <p>Seat maps don't include real measurements, so CineView estimates the hall from the seat layout. If you know the theatre, adjust screen width, row spacing and stadium height in its settings.</p>
+      </details>
+      <details>
+        <summary>Which sites does it work on?</summary>
+        <p>District and BookMyShow seat selection pages, in any Chromium browser.</p>
+      </details>
+      <details>
+        <summary>Is CineView made by District or BookMyShow?</summary>
+        <p>No. CineView is an independent project and isn't affiliated with either company.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <img src="/assets/wordmark.png" alt="CineView" width="160" height="47">
+    <p>Made for people who care where they sit.</p>
+    <nav aria-label="Footer">
+      <a href="https://github.com/Bharathshiva24/CineView" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/Bharathshiva24/CineView/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
+      <a href="#install">Install</a>
+    </nav>
+  </footer>
+
+  <div class="toast" role="status" aria-live="polite"></div>
+  <script src="/main.js" defer></script>
+</body>
+</html>
