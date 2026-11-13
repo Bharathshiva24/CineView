@@ -115,13 +115,16 @@
 
   /* ---------- Sidebar ---------- */
   aside { width: 340px; flex: none; border-radius: 22px; overflow: hidden; display: flex; flex-direction: column;
-    background: rgba(22,22,24,.78); -webkit-backdrop-filter: blur(40px) saturate(180%); backdrop-filter: blur(40px) saturate(180%);
-    box-shadow: inset 0 0 0 .5px rgba(255,255,255,.1); }
+    background: #161618; box-shadow: inset 0 0 0 .5px rgba(255,255,255,.1);
+    isolation: isolate; contain: layout paint; }
   .views { position: relative; flex: 1; overflow: hidden; }
-  .view { position: absolute; inset: 0; display: flex; flex-direction: column; transition: transform .5s ${EASE}, opacity .35s ease; }
-  .view.prefs { transform: translateX(100%); }
-  aside.show-prefs .view.main { transform: translateX(-28%); opacity: 0; pointer-events: none; }
-  aside.show-prefs .view.prefs { transform: none; }
+  .view { position: absolute; inset: 0; display: flex; flex-direction: column; background: #161618;
+    transition: transform .45s ${EASE}, opacity .3s ease, visibility 0s linear .45s; }
+  .view.main { transform: none; }
+  .view.prefs { transform: translateX(100%); visibility: hidden; }
+  aside.show-prefs .view.main { transform: translateX(-24%); opacity: 0; visibility: hidden; pointer-events: none; }
+  aside.show-prefs .view.prefs { transform: none; visibility: visible; transition: transform .45s ${EASE}, opacity .3s ease, visibility 0s; }
+  aside:not(.show-prefs) .view.main { transition: transform .45s ${EASE}, opacity .3s ease, visibility 0s; }
   .top { display: flex; align-items: center; gap: 8px; min-height: 62px; padding: 16px 16px 8px 20px; }
   .top .eyebrow { margin: 0; }
   .top .ttl { font-size: 17px; font-weight: 600; letter-spacing: -.015em; position: absolute; left: 50%; transform: translateX(-50%); }
@@ -150,13 +153,13 @@
   .seg button small { display: block; font-size: 10.5px; font-weight: 400; color: rgba(235,235,245,.5); font-variant-numeric: tabular-nums; margin-top: 1px; }
   .seg button.on small { color: rgba(235,235,245,.75); }
   .seg button.on { background: rgba(99,99,102,.95); box-shadow: 0 3px 8px rgba(0,0,0,.25), inset 0 0 0 .5px rgba(255,255,255,.08); }
-  .score { display: flex; align-items: center; gap: 16px; }
-  .ring { position: relative; width: 68px; height: 68px; flex: none; }
+  .score { display: flex; align-items: center; gap: 12px; }
+  .ring { position: relative; width: 48px; height: 48px; flex: none; }
   .ring svg { transform: rotate(-90deg); }
   .ring circle { transition: stroke-dasharray .8s ${EASE}, stroke .4s ease; }
-  .ring b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 22px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
-  .verdict { font-size: 17px; font-weight: 600; letter-spacing: -.015em; }
-  .summary { color: rgba(235,235,245,.6); margin-top: 2px; }
+  .ring b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 13.5px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .verdict { font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+  .summary { color: rgba(235,235,245,.6); margin-top: 1px; font-size: 12px; }
   .list { border-radius: 12px; background: rgba(118,118,128,.12); overflow: hidden; }
   .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 14px; position: relative; }
   .row + .row::before { content: ""; position: absolute; top: 0; left: 14px; right: 0; height: .5px; background: rgba(255,255,255,.09); }
@@ -287,7 +290,12 @@
     wake();
 
     for (const t of ['keydown', 'keyup', 'keypress']) host.addEventListener(t, (e) => e.stopPropagation());
-    new ResizeObserver(() => render(true)).observe(E.stage);
+    let lastW = 0, lastH = 0;
+    new ResizeObserver(([en]) => {
+      const { width, height } = en.contentRect;
+      if (Math.abs(width - lastW) < 1 && Math.abs(height - lastH) < 1) return;
+      lastW = width; lastH = height; render(true);
+    }).observe(E.stage);
     return host;
   }
 

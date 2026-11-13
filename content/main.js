@@ -219,19 +219,20 @@
   // ---------- keep up with SPA navigation (movie / showtime changes) ----------
   let lastHref = location.href;
   let lastSeenTitle = '';
+  // Re-detect the movie only when the page URL changes (new movie / showtime) – no polling of the page itself
   setInterval(async () => {
-    if (location.href !== lastHref) {
-      lastHref = location.href;
-      setTimeout(rememberMovieOnDetailsPage, 1500);
-    }
+    if (location.href === lastHref) return;
+    lastHref = location.href;
+    setTimeout(rememberMovieOnDetailsPage, 1500);
     if (CV.Overlay && CV.Overlay.isOpen()) {
+      await new Promise((r) => setTimeout(r, 1200)); // let the new page render
       const m = await detectMovie();
       if (m.title && m.title !== lastSeenTitle) {
         lastSeenTitle = m.title;
         CV.Overlay.updateMovie(m.title, { lang: m.lang, ids: m.ids });
       }
     }
-  }, 1500);
+  }, 1000);
 
   setTimeout(rememberMovieOnDetailsPage, 1200);
 })();
