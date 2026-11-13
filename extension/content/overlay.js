@@ -86,11 +86,26 @@
   .capsule { position: absolute; left: 16px; top: 16px; display: flex; align-items: baseline; gap: 8px; padding: 8px 14px;
     border-radius: 999px; pointer-events: none; font-weight: 600; font-size: 13px; transition: opacity .4s ease; }
   .capsule span { font-weight: 400; color: rgba(235,235,245,.6); }
-  .fmtpill { position: absolute; right: 16px; top: 16px; padding: 8px 14px; border-radius: 999px; font-weight: 600; font-size: 13px; pointer-events: none;
-    transition: opacity .4s ease, transform .4s ${EASE}; }
-  .fmtpill span { font-weight: 400; color: rgba(235,235,245,.6); margin-left: 6px; }
-  .fmtpill.flash { transform: scale(1.06); }
-  .stage.idle .fmtpill:not(.flash) { opacity: 0; }
+  .fmtpill { position: absolute; right: 16px; top: 16px; z-index: 6; display: flex; align-items: center; gap: 6px; padding: 7px 10px 7px 14px;
+    border: 0; border-radius: 999px; color: #f5f5f7; font: inherit; font-weight: 600; font-size: 13px; cursor: pointer;
+    transition: opacity .4s ease, transform .4s ${EASE}, background .2s; }
+  .fmtpill:hover { background: rgba(58,58,60,.75); }
+  .fmtpill span { font-weight: 400; color: rgba(235,235,245,.6); }
+  .fmtpill i { width: 14px; height: 14px; opacity: .6; }
+  .fmtpill .auto { font-size: 10px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: #30d158;
+    background: rgba(48,209,88,.14); padding: 2px 6px; border-radius: 999px; }
+  .fmtpill.flash { transform: scale(1.05); }
+  .stage.idle .fmtpill:not(.flash):not(.open) { opacity: 0; }
+  .fmtmenu { position: absolute; right: 16px; top: 58px; z-index: 7; width: 290px; border-radius: 14px; padding: 6px; opacity: 0;
+    transform: scale(.96); transform-origin: 100% 0; pointer-events: none; transition: opacity .2s ease, transform .3s ${EASE}; }
+  .fmtmenu.open { opacity: 1; transform: none; pointer-events: auto; }
+  .fmtmenu .hdr { padding: 6px 10px 8px; font-size: 11px; color: rgba(235,235,245,.5); line-height: 1.35; }
+  .fmtmenu .hdr b { display: block; font-size: 13px; color: #f5f5f7; font-weight: 600; margin-bottom: 1px; }
+  .fmtmenu .fi { display: grid; grid-template-columns: 18px 1fr auto; gap: 8px; align-items: center; padding: 8px 10px; border-radius: 8px; cursor: pointer; }
+  .fmtmenu .fi:hover { background: rgba(255,255,255,.1); }
+  .fmtmenu .fi i { width: 16px; height: 16px; }
+  .fmtmenu .fi b { font-weight: 500; } .fmtmenu .fi b em { font-style: normal; font-size: 10px; font-weight: 600; color: #30d158; margin-left: 6px; letter-spacing: .03em; }
+  .fmtmenu .fi small { color: rgba(235,235,245,.5); font-variant-numeric: tabular-nums; }
   .toast { position: absolute; left: 50%; top: 16px; transform: translate(-50%, -8px); opacity: 0; padding: 8px 14px; border-radius: 12px;
     font-weight: 500; pointer-events: none; transition: opacity .3s ease, transform .4s ${EASE}; max-width: 70%; text-align: center; }
   .toast.show { opacity: 1; transform: translate(-50%, 0); }
@@ -122,7 +137,7 @@
   .mdiv { height: .5px; background: rgba(255,255,255,.12); margin: 5px 8px; }
 
   /* ---------- Sidebar ---------- */
-  aside { width: 340px; flex: none; border-radius: 22px; overflow: hidden; display: flex; flex-direction: column;
+  aside { width: clamp(300px, 25vw, 350px); flex: none; min-width: 0; border-radius: 22px; overflow: hidden; display: flex; flex-direction: column;
     background: #161618; box-shadow: inset 0 0 0 .5px rgba(255,255,255,.1);
     isolation: isolate; contain: layout paint; }
   .views { position: relative; flex: 1; overflow: hidden; }
@@ -142,7 +157,7 @@
   .backbtn { display: flex; align-items: center; gap: 2px; border: 0; background: none; color: #f5f5f7; font: inherit; font-size: 15px; cursor: pointer; padding: 4px 6px 4px 0; }
   .backbtn i { width: 18px; height: 18px; }
   .backbtn:hover { opacity: .7; }
-  .scroll { flex: 1; overflow-x: hidden; overflow-y: auto; padding: 4px 20px 24px; display: flex; flex-direction: column; gap: 22px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.15) transparent; }
+  .scroll { flex: 1; min-width: 0; overflow-x: hidden; overflow-y: auto; padding: 4px 20px 24px; display: flex; flex-direction: column; gap: 22px; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.15) transparent; }
   .eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: rgba(235,235,245,.45); margin-bottom: 6px; }
   .movie form { position: relative; }
   .movie input { width: 100%; font: inherit; font-size: 24px; font-weight: 700; letter-spacing: -.025em; color: #fff; background: transparent;
@@ -161,7 +176,8 @@
   .seg button small { display: block; font-size: 10.5px; font-weight: 400; color: rgba(235,235,245,.5); font-variant-numeric: tabular-nums; margin-top: 1px; }
   .seg button.on small { color: rgba(235,235,245,.75); }
   .seg button.on { background: rgba(99,99,102,.95); box-shadow: 0 3px 8px rgba(0,0,0,.25), inset 0 0 0 .5px rgba(255,255,255,.08); }
-  .score { display: flex; align-items: center; gap: 12px; }
+  .score { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .score > div:last-child { min-width: 0; }
   .ring { position: relative; width: 48px; height: 48px; flex: none; }
   .ring svg { transform: rotate(-90deg); }
   .ring circle { transition: stroke-dasharray .8s ${EASE}, stroke .4s ease; }
@@ -171,8 +187,9 @@
   .list { border-radius: 12px; background: rgba(118,118,128,.12); overflow: hidden; }
   .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 14px; position: relative; }
   .row + .row::before { content: ""; position: absolute; top: 0; left: 14px; right: 0; height: .5px; background: rgba(255,255,255,.09); }
-  .row .k { color: #f5f5f7; } .row .k small { display: block; color: rgba(235,235,245,.45); font-size: 11.5px; margin-top: 1px; }
-  .row .v { font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+  .row .k { color: #f5f5f7; flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+  .row .k small { display: block; color: rgba(235,235,245,.45); font-size: 11.5px; margin-top: 1px; }
+  .row .v { flex: none; max-width: 45%; font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
   .v.good { color: #30d158; } .v.mid { color: #ffd60a; } .v.bad { color: #ff9f0a; }
   .map { position: relative; border-radius: 12px; background: rgba(118,118,128,.12); overflow: hidden; touch-action: none; user-select: none; cursor: grab; }
   .map.dragging { cursor: grabbing; }
@@ -199,7 +216,7 @@
   .zoomlbl { position: absolute; left: 10px; bottom: 8px; z-index: 5; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 999px;
     background: rgba(44,44,46,.94); color: rgba(235,235,245,.8); opacity: 0; transition: opacity .3s; pointer-events: none; font-variant-numeric: tabular-nums; }
   .zoomlbl.show { opacity: 1; }
-  .legend { display: flex; gap: 14px; margin-top: 8px; color: rgba(235,235,245,.5); font-size: 11.5px; }
+  .legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 14px; margin-top: 10px; color: rgba(235,235,245,.5); font-size: 11.5px; }
   .legend span { display: flex; align-items: center; gap: 5px; } .legend i { width: 8px; height: 8px; border-radius: 2px; }
   .set { padding: 12px 14px; position: relative; }
   .set + .set::before { content: ""; position: absolute; top: 0; left: 14px; right: 0; height: .5px; background: rgba(255,255,255,.09); }
@@ -238,7 +255,8 @@
           </div>
           <div class="vignette"></div>
           <div class="capsule glass"></div>
-          <div class="fmtpill glass"></div>
+          <button class="fmtpill glass" title="Screen format"></button>
+          <div class="fmtmenu glass"></div>
           <div class="toast glass"></div>
           <div class="menu glass"></div>
           <div class="player glass">
@@ -292,7 +310,7 @@
     state.els = {
       backdrop: q('.backdrop'), stage: q('.stage'), camera: q('.camera'), env: q('.env'), rows: q('.rows'), screen: q('.screen'),
       capsule: q('.capsule'), toast: q('.toast'), menu: q('.menu'), play: q('.play'), mute: q('.mute'), trailerBtn: q('.trailer-btn'),
-      next: q('.next'), yt: q('.yt'), close: q('.x'), close2: q('.x2'), gear: q('.gear'), backbtn: q('.backbtn'), aside: q('aside'), fmtpill: q('.fmtpill'), mapinner: q('.mapinner'), zin: q('.zin'), zout: q('.zout'), zfit: q('.zfit'), zoomlbl: q('.zoomlbl'), form: q('.movie form'), title: q('.title'), dot: q('.dot'), srctext: q('.srctext'),
+      next: q('.next'), yt: q('.yt'), close: q('.x'), close2: q('.x2'), gear: q('.gear'), backbtn: q('.backbtn'), aside: q('aside'), fmtpill: q('.fmtpill'), fmtmenu: q('.fmtmenu'), mapinner: q('.mapinner'), zin: q('.zin'), zout: q('.zout'), zfit: q('.zfit'), zoomlbl: q('.zoomlbl'), form: q('.movie form'), title: q('.title'), dot: q('.dot'), srctext: q('.srctext'),
       seats: q('.seats'), seatseg: q('.seatseg'), arc: q('.arc'), num: q('.num'), verdict: q('.verdict'), summary: q('.summary'),
       metrics: q('.metrics'), map: q('.map'), setlist: q('.setlist')
     };
@@ -301,6 +319,7 @@
     const E = state.els;
     E.close.onclick = E.close2.onclick = () => CV.Overlay.close();
     E.gear.onclick = () => togglePrefs(true);
+    E.fmtpill.onclick = (e) => { e.stopPropagation(); const o = !E.fmtmenu.classList.contains('open'); E.fmtmenu.classList.toggle('open', o); E.fmtpill.classList.toggle('open', o); };
     setupMapInteractions();
     E.backbtn.onclick = () => togglePrefs(false);
     E.backdrop.addEventListener('mousedown', (e) => { if (e.target === E.backdrop) CV.Overlay.close(); });
@@ -308,7 +327,11 @@
     E.mute.onclick = toggleMute;
     E.next.onclick = () => playTrailer(state.trailerIdx + 1);
     E.trailerBtn.onclick = (e) => { e.stopPropagation(); E.menu.classList.toggle('open'); };
-    root.addEventListener('mousedown', (e) => { if (!e.composedPath().includes(E.menu) && !e.composedPath().includes(E.trailerBtn)) E.menu.classList.remove('open'); });
+    root.addEventListener('mousedown', (e) => {
+      const path = e.composedPath();
+      if (!path.includes(E.menu) && !path.includes(E.trailerBtn)) E.menu.classList.remove('open');
+      if (!path.includes(E.fmtmenu) && !path.includes(E.fmtpill)) { E.fmtmenu.classList.remove('open'); E.fmtpill.classList.remove('open'); }
+    });
     E.form.onsubmit = (e) => { e.preventDefault(); E.title.blur(); loadTrailers(E.title.value, null); };
 
     // auto-hide the player controls while watching
@@ -447,7 +470,9 @@
     E.verdict.textContent = m.verdict;
     E.summary.textContent = m.headline;
     const fm = view.screen.format;
-    E.fmtpill.innerHTML = `${esc(fm.name)}<span>${ratioText(fm)} · ${view.screen.w.toFixed(1)} × ${view.screen.h.toFixed(1)} m</span>`;
+    const isAuto = state.formatInfo && state.formatInfo.ratio && Math.abs(state.formatInfo.ratio - fm.ratio) < 0.01 && !state.formatManual;
+    E.fmtpill.innerHTML = `${esc(fm.name)}<span>${ratioText(fm)} · ${view.screen.w.toFixed(1)} × ${view.screen.h.toFixed(1)} m</span>${isAuto ? '<span class="auto">Auto</span>' : ''}<i>${ICON.updown}</i>`;
+    renderFormatMenu();
     E.capsule.innerHTML = `${esc(seatName(seat))}${seat.status === 'occupied' ? ' · booked' : ''}<span>${m.distance.toFixed(1)} m from screen</span>`;
 
     const fill = m.hAngle >= 33 && m.hAngle <= 46 ? 'good' : m.hAngle >= 26 && m.hAngle <= 56 ? 'mid' : 'bad';
@@ -591,22 +616,22 @@
   }
 
   const ratioText = (f) => (f.id === 'hd' ? '16:9' : f.ratio.toFixed(2) + ':1');
-  function renderFormats() {
-    const seg = state.els.formatseg;
-    if (!seg) return;
-    seg.textContent = '';
+  function renderFormatMenu() {
+    const menu = state.els.fmtmenu;
     const cur = CV.formatFor(state.settings.aspect);
+    const info = state.formatInfo || {};
+    const detected = info.ratio ? CV.formatFor(info.ratio) : null;
+    menu.innerHTML = `<div class="hdr"><b>Screen format</b>${esc(info.source ? 'Detected from ' + info.source : 'Not listed on the page – CinemaScope assumed')}</div>`;
     for (const f of CV.FORMATS) {
-      const b = h('button', f === cur ? 'on' : '', `${f.label}<small>${f.id === 'hd' ? '1.78:1' : f.ratio.toFixed(2) + ':1'}</small>`);
-      b.type = 'button'; b.title = f.name;
-      b.onclick = () => setFormat(f);
-      seg.appendChild(b);
+      const it = h('div', 'fi', `<i>${f === cur ? ICON.check : ''}</i><b>${esc(f.name)}${f === detected ? '<em>DETECTED</em>' : ''}</b><small>${ratioText(f)}</small>`);
+      it.onclick = () => { setFormat(f, true); menu.classList.remove('open'); state.els.fmtpill.classList.remove('open'); };
+      menu.appendChild(it);
     }
   }
 
-  function setFormat(f) {
+  function setFormat(f, manual) {
     state.settings.aspect = f.ratio;
-    renderSettings();
+    if (manual) state.formatManual = !(state.formatInfo && state.formatInfo.ratio && Math.abs(state.formatInfo.ratio - f.ratio) < 0.01);
     render(false);
     const pill = state.els.fmtpill;
     pill.classList.add('flash'); if (state.wake) state.wake();
@@ -638,11 +663,6 @@
   function renderSettings() {
     const list = state.els.setlist, s = state.settings;
     list.textContent = '';
-    const fmt = h('div', 'set', '<header><span>Screen format</span><span></span></header>');
-    const fseg = h('div', 'seg');
-    fmt.appendChild(fseg); list.appendChild(fmt);
-    state.els.formatseg = fseg; renderFormats();
-    fmt.querySelector('header span:last-child').textContent = CV.formatFor(s.aspect).name;
     const fit = h('div', 'set', '<header><span>Trailer on screen</span><span></span></header>');
     const seg = h('div', 'seg');
     for (const [v, t] of [['cover', 'Fill screen'], ['fit', 'Show full frame']]) {
@@ -809,7 +829,7 @@
       if (state.host) this.close(true);
       Object.assign(state, {
         layout: ctx.layout, selected: ctx.selected || [], seat: ctx.seat, settings: { ...CV.DEFAULT_SETTINGS, ...(ctx.settings || {}) },
-        trailers: [], trailerIdx: 0, muted: true, playing: true, iframe: null, hints: ctx.hints || null
+        trailers: [], trailerIdx: 0, muted: true, playing: true, iframe: null, hints: ctx.hints || null, formatInfo: ctx.formatInfo || null, formatManual: false
       });
       document.documentElement.appendChild(build());
       window.addEventListener('message', onYtMessage);
@@ -821,6 +841,13 @@
     },
     // Called when the page switches to another movie/show while open
     updateMovie(title, hints) { if (state.host && title && title !== state.title) loadTrailers(title, hints || null); },
+    // Called when the selected show changes (e.g. user picks the IMAX showtime while the preview is open)
+    updateFormat(info) {
+      if (!state.host || !info || !info.ratio) return;
+      state.formatInfo = info;
+      if (!state.formatManual && Math.abs(state.settings.aspect - info.ratio) > 0.01) setFormat(CV.formatFor(info.ratio), false);
+      else render(true);
+    },
     close(immediate) {
       if (!state.host) return;
       window.removeEventListener('message', onYtMessage);

@@ -142,31 +142,43 @@
     return null;
   }
 
-  // Find the showtime chip whose time matches the selected show and read its label/caption (e.g. "IMAX 3D")
+  // Find the showtime chip whose time matches the selected show and read its label/caption (e.g. "10:30 PM · IMAX 3D").
+  // Returns { ratio, source } or null.
   function detectFormat(showLine) {
+    // 1) The cinema / screen name itself (e.g. "PVR IMAX Lower Parel", "Audi 3 – IMAX")
+    const venue = (showLine || '').split(/\bat\b/i).slice(1).join(' ');
+    const fv = formatFromText(venue);
+    if (fv) return { ratio: fv, source: 'the cinema name' };
+
+    // 2) The showtime chip for the selected time
     const m = (showLine || '').match(/(\d{1,2}:\d{2})\s?(am|pm)/i);
     if (!m) return null;
     const want = (m[1] + ' ' + m[2]).toLowerCase().replace(/^0/, '');
     const norm = (t) => t.toLowerCase().replace(/\s+/g, ' ').replace(/(\d)(am|pm)/, '$1 $2').replace(/^0/, '').trim();
+    let fallback = null;
     for (const el of document.body.querySelectorAll('*')) {
       if (el.children.length > 0 || el.closest('#cineview-root,script,style')) continue;
       const raw = el.textContent || '';
       if (raw.length > 12 || norm(raw) !== want) continue;
       const r = el.getBoundingClientRect();
-      if (!r.width || r.top > 700) continue;
-      // climb to the chip + its caption (stay small so we don't read the whole showtime strip)
+      if (!r.width || r.top > 800) continue;
+      // climb to the chip + its caption, staying small so we don't read the whole showtime strip
       let node = el, text = '';
-      for (let i = 0; i < 4 && node; i++) {
+      for (let i = 0; i < 5 && node; i++) {
         const t = (node.innerText || '').replace(/\s+/g, ' ').trim();
         if (t.length > 40) break;
         text = t;
         node = node.parentElement;
       }
-      const f = formatFromText(text);
-      if (f) return f;
-      if (text) return 2.39; // matched the chip and it isn't IMAX → standard scope house
+      // tidy "10:30 PM IMAX IMAX 3D" → "10:30 PM · IMAX 3D"
+      const words = text.replace(/\s+/g, ' ').split(' ');
+      const tidy = words.filter((w, i) => !words.slice(i + 1).some((x) => x.toLowerCase() === w.toLowerCase() && !/\d/.test(w)));
+      const label = tidy.join(' ');
+      const f = formatFromText(label);
+      if (f) return { ratio: f, source: `the showtime “${label.replace(/(\d{1,2}:\d{2}\s?[AP]M)/i, '$1 ·')}”` };
+      if (label && !fallback) fallback = { ratio: 2.39, source: `the showtime “${label.replace(/(\d{1,2}:\d{2}\s?[AP]M)/i, '$1 ·')}” (standard screen)` };
     }
-    return null;
+    return fallback;
   }
 
   async function remembered() {
@@ -197,7 +209,11 @@
       ids = [...new Set([...(mem.ids || []), ...ids])];
     }
     // Screen format: the showtime chip matching the selected show ("10:30 PM · IMAX 3D"), then the header
-    const format = detectFormat(headScope) || formatFromText(nearText + ' ' + ((document.querySelector('header') || {}).innerText || ''));
+    let format = detectFormat(headScope);
+    if (!format) {
+      const f = formatFromText(nearText + ' ' + ((document.querySelector('header') || {}).innerText || ''));
+      if (f) format = { ratio: f, source: 'the booking header' };
+    }
     return { title, lang, ids, format };
   }
   CV.detectMovie = detectMovie;
@@ -233,8 +249,8 @@
     let settings = {};
     try { settings = (await chrome.storage.sync.get({ settings: {} })).settings || {}; } catch (_) {}
     const movie = await detectMovie();
-    settings.aspect = movie.format || 2.39; // format is per show, not a saved preference
-    CV.Overlay.open({ layout, selected, seat, title: movie.title, hints: { lang: movie.lang, ids: movie.ids }, settings, message });
+    settings.aspect = (movie.format && movie.format.ratio) || 2.39; // format is per show, not a saved preference
+    CV.Overlay.open({ layout, selected, seat, title: movie.title, hints: { lang: movie.lang, ids: movie.ids }, formatInfo: movie.format, settings, message });
     lastSeenTitle = movie.title;
   }
   CV.openPreview = openPreview;
@@ -257,6 +273,7 @@
     if (CV.Overlay && CV.Overlay.isOpen()) {
       await new Promise((r) => setTimeout(r, 1200)); // let the new page render
       const m = await detectMovie();
+      if (m.format) CV.Overlay.updateFormat(m.format);
       if (m.title && m.title !== lastSeenTitle) {
         lastSeenTitle = m.title;
         CV.Overlay.updateMovie(m.title, { lang: m.lang, ids: m.ids });

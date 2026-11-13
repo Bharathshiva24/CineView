@@ -4,10 +4,11 @@
 * { box-sizing: border-box; margin: 0; }
 body { width: 300px; padding: 18px; background: var(--bg); color: var(--fg);
   font: 13px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
-header { display: flex; align-items: center; gap: 12px; }
-header img { width: 44px; height: 44px; border-radius: 11px; box-shadow: 0 0 0 .5px var(--line), 0 4px 12px rgba(0,0,0,.08); }
+header { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; padding-top: 4px; }
+header img.wm { width: 168px; height: auto; display: block; }
 h1 { font-size: 19px; font-weight: 700; letter-spacing: -.02em; } h1 em { font-style: normal; color: var(--red); }
 header p { color: var(--sub); }
+.busy { justify-content: center; }
 .busy { display: flex; align-items: center; gap: 10px; margin-top: 18px; color: var(--sub); }
 .spin { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--line); border-top-color: var(--fg); animation: s 1s linear infinite; }
 @keyframes s { to { transform: rotate(360deg) } }

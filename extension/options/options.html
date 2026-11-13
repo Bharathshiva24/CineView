@@ -7,7 +7,7 @@
 body { background: var(--bg); color: var(--fg); font: 14px/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
 main { max-width: 600px; margin: 64px auto; padding: 0 24px; }
 .hero { text-align: center; margin-bottom: 40px; }
-.hero img { width: 84px; height: 84px; border-radius: 20px; box-shadow: 0 0 0 .5px var(--line), 0 10px 30px rgba(0,0,0,.12); }
+.hero img.wm { width: 300px; max-width: 80%; height: auto; display: block; margin: 0 auto 14px; }
 h1 { font-size: 34px; font-weight: 700; letter-spacing: -.03em; margin-top: 16px; } h1 em { font-style: normal; color: var(--red); }
 .hero p { color: var(--sub); font-size: 17px; }
 h2 { font-size: 13px; font-weight: 400; text-transform: uppercase; letter-spacing: .04em; color: var(--sub); margin: 28px 16px 8px; }
@@ -22,7 +22,7 @@ button.danger { color: var(--red); }
 a { color: #0a84ff; text-decoration: none; }
 </style></head>
 <body><main>
-  <div class="hero"><img src="../icons/icon128.png" alt=""><h1>Cine<em>View</em></h1><p>See the screen from your seat.</p></div>
+  <div class="hero"><img class="wm" src="../icons/wordmark-transparent.png" alt="CineView"><p>See the screen from your seat.</p></div>
   <h2>Trailers</h2>
   <div class="card">
     <div class="row"><input id="key" placeholder="YouTube Data API key (optional)" autocomplete="off" spellcheck="false"></div>
