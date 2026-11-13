@@ -3,6 +3,10 @@
 All notable changes to CineView. Versions follow [Semantic Versioning](https://semver.org): **MAJOR.MINOR.PATCH**.
 Every version is archived as a ready-to-load zip in [`releases/`](releases/) and tagged in git (`vX.Y.Z`).
 
+## v2.4.1 — 2026-11-14
+- New **CINEVIEW** logo on the website header and footer, the extension popup and settings page, and the README. The circular icon is unchanged.
+- New social share image (option B, "Cinematic") with an absolute URL and size tags, so WhatsApp, X, LinkedIn and Slack show it reliably.
+
 ## Website update — 2026-11-14
 - Typography: the site uses Netflix Sans where it's installed, with Inter (self-hosted) as the bundled fallback, everywhere.
 - Single favicon: the circular CinemaScope mark (PNG and ICO only). Removed the SVG, Apple touch and manifest icon variants.
