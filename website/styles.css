@@ -67,7 +67,7 @@ kbd { border: 1px solid var(--line); }
   border-bottom: 1px solid transparent; transition: border-color .2s; }
 .nav.scrolled { border-bottom-color: var(--line); }
 .brand { display: flex; align-items: center; flex: none; text-decoration: none; }
-.brand img { width: 132px; height: auto; }
+.brand img { width: 128px; height: auto; }
 .nav nav { display: flex; gap: 26px; margin-left: auto; }
 .nav nav a { text-decoration: none; color: var(--seat); font-weight: 500; font-size: .96rem; }
 .nav nav a:hover { color: var(--ink); }
