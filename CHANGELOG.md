@@ -3,6 +3,12 @@
 All notable changes to CineView. Versions follow [Semantic Versioning](https://semver.org): **MAJOR.MINOR.PATCH**.
 Every version is archived as a ready-to-load zip in [`releases/`](releases/) and tagged in git (`vX.Y.Z`).
 
+## Website update — 2026-11-14 (live demo)
+- Hero: the static screenshot is replaced by a **live demo** with two separate panels. On the left, the cinema view plays an official trailer (muted autoplay, with a sound button). On the right, you choose the movie and pick a seat, and the view, score and stats update. There's no connecting divider between the panels.
+- Trailers: F1 The Movie (Warner Bros.) and Spider-Man: Brand New Day (Sony Pictures), embedded from the studios' official YouTube channels. They play only while visible.
+- IMAX section: the selected trailer plays inside the screen and covers it at each format's real proportions. The section has a mobile layout (screen sized to the viewport, 2×2 format picker, tighter spacing) with no sideways scrolling.
+- Removed all Ramayana images. The share image now shows original CineView artwork on the screen.
+
 ## v2.4.1 — 2026-11-14
 - New **CINEVIEW** logo on the website header and footer, the extension popup and settings page, and the README. The circular icon is unchanged.
 - New social share image (option B, "Cinematic") with an absolute URL and size tags, so WhatsApp, X, LinkedIn and Slack show it reliably.
