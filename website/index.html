@@ -6,17 +6,13 @@
   <title>CineView – See the screen from your seat</title>
   <meta name="description" content="CineView is a free Chrome extension for District and BookMyShow. Pick a seat and see the cinema screen from it, with the movie's trailer playing, before you book.">
   <meta name="theme-color" content="#ffffff">
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
-  <link rel="icon" href="/favicon.ico" sizes="any">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" href="/favicon.png?v=3" type="image/png">
   <meta property="og:title" content="CineView – See the screen from your seat">
   <meta property="og:description" content="Preview the cinema screen from the seat you picked on District or BookMyShow, with the trailer playing.">
   <meta property="og:image" content="/assets/og.jpg">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="preload" href="/fonts/archivo-var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -24,8 +20,7 @@
 
   <header class="nav">
     <a class="brand" href="/" aria-label="CineView home">
-      <img src="/favicon.svg" alt="" width="28" height="28">
-      <span>CineView</span>
+      <img src="/assets/wordmark.png?v=3" alt="CineView" width="132" height="39">
     </a>
     <nav aria-label="Main">
       <a href="#how">How it works</a>
@@ -47,9 +42,9 @@
         </div>
         <p class="fine">Version 2.4.0. Free and open source. Works in Chrome, Edge, Brave and Arc.</p>
       </div>
-      <figure class="hero-screen">
-        <div class="curve">
-          <img src="/assets/preview-trailer.jpg" alt="CineView on District: the Ramayana teaser playing on the cinema screen, seen from the selected seat, with the seat score and seat map beside it" width="1800" height="998">
+      <figure class="hero-visual" data-parallax>
+        <div class="parallax">
+          <img src="/assets/preview-trailer.jpg?v=3" alt="CineView on District: the Ramayana teaser playing on the cinema screen, seen from the selected seat, with the seat score and seat map beside it" width="1800" height="998" fetchpriority="high">
         </div>
         <figcaption>A real booking on District: row F, 10.3 m from the screen, scored 97.</figcaption>
       </figure>
@@ -88,7 +83,7 @@
             <li>Sound balance from your position in the hall</li>
           </ul>
         </div>
-        <img class="shot" src="/assets/front-side.jpg" alt="Front-row, far-side seat: the screen appears skewed and the score is low" width="1400" height="836" loading="lazy">
+        <img class="shot" src="/assets/front-side.jpg?v=3" alt="Front-row, far-side seat: the screen appears skewed and the score is low" width="1400" height="836" loading="lazy">
       </article>
 
       <article class="feature flip">
@@ -100,7 +95,7 @@
             <li>Pinch, the + and − buttons, or keys + and − to zoom</li>
           </ul>
         </div>
-        <img class="shot" src="/assets/seat-map.jpg" alt="Zoomed seat map with seat numbers and the previewed seat in red" width="1400" height="836" loading="lazy">
+        <img class="shot" src="/assets/seat-map.jpg?v=3" alt="Zoomed seat map with seat numbers and the previewed seat in red" width="1400" height="836" loading="lazy">
       </article>
     </section>
 
@@ -112,7 +107,7 @@
       </div>
       <div class="format-stage">
         <div class="format-screen" data-ratio="2.39">
-          <img src="/assets/film.jpg" alt="" width="1140" height="479" loading="lazy">
+          <img src="/assets/film.jpg?v=3" alt="" width="1140" height="479" loading="lazy">
         </div>
       </div>
       <div class="format-picker" role="radiogroup" aria-label="Screen format">
@@ -188,7 +183,7 @@
   </main>
 
   <footer class="foot">
-    <img src="/assets/wordmark.png" alt="CineView" width="160" height="47">
+    <img src="/assets/wordmark.png?v=3" alt="CineView" width="160" height="47">
     <p>Made for people who care where they sit.</p>
     <nav aria-label="Footer">
       <a href="https://github.com/Bharathshiva24/CineView" target="_blank" rel="noopener">GitHub</a>

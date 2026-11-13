@@ -5,6 +5,27 @@
   onScroll();
   window.addEventListener('scroll', onScroll, { passive: true });
 
+  // Hero parallax: the preview rises a little faster than the page while the headline stays fixed
+  const par = document.querySelector('[data-parallax]');
+  const hero = document.querySelector('.hero');
+  const copy = document.querySelector('.hero-copy');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const small = window.matchMedia('(max-width: 760px)');
+  let ticking = false;
+  const update = () => {
+    ticking = false;
+    if (!par || reduce.matches || small.matches) { if (par) { par.style.setProperty('--py', '0px'); copy.style.opacity = ''; } return; }
+    const y = Math.min(window.scrollY, hero.offsetHeight);
+    par.style.setProperty('--py', `${(-y * 0.12).toFixed(1)}px`);
+    // fade the fixed headline as the preview slides over it, so it never peeks out once the image has passed
+    const c = copy.getBoundingClientRect(), img = par.getBoundingClientRect();
+    const covered = Math.min(1, Math.max(0, (c.bottom - img.top) / (c.height * 0.55)));
+    copy.style.opacity = String(1 - covered);
+  };
+  window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+  window.addEventListener('resize', update);
+  update();
+
   // Format demo: the screen keeps its width and takes each format's real proportions
   const screen = document.querySelector('.format-screen');
   const buttons = [...document.querySelectorAll('.format-picker button')];

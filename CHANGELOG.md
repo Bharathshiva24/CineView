@@ -3,6 +3,14 @@
 All notable changes to CineView. Versions follow [Semantic Versioning](https://semver.org): **MAJOR.MINOR.PATCH**.
 Every version is archived as a ready-to-load zip in [`releases/`](releases/) and tagged in git (`vX.Y.Z`).
 
+## Website update — 2026-11-14
+- Typography: the site uses Netflix Sans where it's installed, with Inter (self-hosted) as the bundled fallback, everywhere.
+- Single favicon: the circular CinemaScope mark (PNG and ICO only). Removed the SVG, Apple touch and manifest icon variants.
+- Header shows the full CineView wordmark, the same one as the footer.
+- Hero: no CinemaScope mask. The headline stays fixed and fades as the preview scrolls up over it with a gentle parallax. The effect is turned off on small screens and for reduced motion.
+- Images: removed the 7-day cache on `/assets`, which could keep a failed image response cached in the browser, and added `?v=3` to image URLs so browsers fetch fresh copies.
+- No horizontal scrolling: grid and flex children can shrink, long words wrap, and the page clips sideways overflow. Tested at 320–1440 px, including with every image failing.
+
 ## v2.4.0 — 2026-11-14
 - New app icon: the red concave screen on a white disk, used for the toolbar icon and site favicon (SVG, ICO, PNG and Apple touch icon).
 - **CineView website** in `website/`: landing page, how it works, interactive screen-format demo, install guide with a direct download, and FAQ. It's a static site with a self-hosted Archivo font, live at **https://cineview-ten.vercel.app**. Vercel deploys it from `website/` on every push to `main`.
