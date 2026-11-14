@@ -3,6 +3,10 @@
 All notable changes to CineView. Versions follow [Semantic Versioning](https://semver.org): **MAJOR.MINOR.PATCH**.
 Every version is archived as a ready-to-load zip in [`releases/`](releases/) and tagged in git (`vX.Y.Z`).
 
+## [2.4.5] - 2026-11-14
+- New app icon: a white CinemaScope screen on a red disc, redrawn as vector art so it stays sharp at every size (toolbar, extensions page, Chrome Web Store).
+- Website: matching favicon (SVG, PNG and ICO) and an Apple touch icon.
+
 ## Website update (2026-11-14)
 - CineView is live on the Chrome Web Store (https://chromewebstore.google.com/detail/pmccaejammpjhefgpalbbfdmohkklihi). The nav, hero and install buttons are now "Add to Chrome" and open the store listing; the zip and manual steps stay available as a secondary option. README updated to match.
 

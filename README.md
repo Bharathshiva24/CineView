@@ -7,7 +7,7 @@
 <p align="center"><img src="docs/screenshots/trailer-preview.png" alt="CineView on District: Ramayana teaser playing on the cinema screen, seen from the selected seat"></p>
 <p align="center"><sub>A real booking on District, with the movie's official teaser playing on the screen as seen from the selected seat.</sub></p>
 
-<p align="center"><b><a href="https://cineview-ten.vercel.app">cineview-ten.vercel.app</a></b> · Current version: v2.4.4 · <a href="CHANGELOG.md">Changelog</a> · <a href="releases/">All versions</a></p>
+<p align="center"><b><a href="https://cineview-ten.vercel.app">cineview-ten.vercel.app</a></b> · Current version: v2.4.5 · <a href="CHANGELOG.md">Changelog</a> · <a href="releases/">All versions</a></p>
 
 ## Why
 
@@ -53,9 +53,9 @@ Seat maps are flat grids. They don't show how big the screen will look, whether 
 <details>
 <summary>Install manually instead</summary>
 
-1. Download the zip from [cineview-ten.vercel.app](https://cineview-ten.vercel.app) or [`releases/`](releases/) (`cineview-v2.4.4.zip`) and unzip it. Or clone the repo: `git clone https://github.com/Bharathshiva24/CineView.git`.
+1. Download the zip from [cineview-ten.vercel.app](https://cineview-ten.vercel.app) or [`releases/`](releases/) (`cineview-v2.4.5.zip`) and unzip it. Or clone the repo: `git clone https://github.com/Bharathshiva24/CineView.git`.
 2. Open `chrome://extensions` and turn on **Developer mode**.
-3. Click **Load unpacked** and choose the folder that contains `manifest.json`: the unzipped `cineview-v2.4.4` folder, or `extension/` in a clone.
+3. Click **Load unpacked** and choose the folder that contains `manifest.json`: the unzipped `cineview-v2.4.5` folder, or `extension/` in a clone.
 4. Pin **CineView** to the toolbar.
 
 </details>
@@ -106,7 +106,7 @@ cineview/
 │   └── icons/               toolbar icons + wordmark
 ├── website/              ← landing page, live at cineview-ten.vercel.app (Vercel redeploys on every push to main)
 ├── releases/             ← every version archived as a ready-to-load zip
-│   ├── cineview-v2.4.4.zip  (latest)
+│   ├── cineview-v2.4.5.zip  (latest)
 │   ├── cineview-v2.4.1.zip
 │   ├── cineview-v2.4.0.zip
 │   ├── cineview-v2.3.0.zip
