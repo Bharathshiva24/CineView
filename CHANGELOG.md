@@ -3,6 +3,9 @@
 All notable changes to CineView. Versions follow [Semantic Versioning](https://semver.org): **MAJOR.MINOR.PATCH**.
 Every version is archived as a ready-to-load zip in [`releases/`](releases/) and tagged in git (`vX.Y.Z`).
 
+## Website update (2026-11-14)
+- Added a privacy policy page at /privacy (linked from the footer) for the Chrome Web Store listing.
+
 ## v2.4.3 (2026-11-14)
 - BookMyShow's newer seat layout (drawn on a canvas with Konva) is now read directly: real rows, seat numbers, booked seats, section breaks and your selected seats, instead of falling back to a typical hall. A small page script (`content/konva-bridge.js`) reads the seat objects and never changes the page. Needs Chrome 111 or later.
 - Trailer search ignores a language suffix in the title ("Jailer 2 - Tamil", "Coolie (Telugu)") and uses it as the language hint instead, so these films find their trailer.

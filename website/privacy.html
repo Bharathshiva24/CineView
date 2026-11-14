@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy policy – CineView</title>
+  <meta name="description" content="How the CineView Chrome extension handles your data: it collects none.">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" href="/favicon.png?v=3" type="image/png">
+  <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .legal { max-width: 720px; margin: 0 auto; padding: 120px 24px 80px; }
+    .legal h1 { font-size: clamp(32px, 5vw, 48px); line-height: 1.1; letter-spacing: -0.02em; margin: 0 0 8px; }
+    .legal .updated { color: #6e6e73; margin: 0 0 40px; }
+    .legal h2 { max-width: none; font-size: 22px; margin: 40px 0 12px; letter-spacing: -0.01em; }
+    .legal p, .legal li { font-size: 17px; line-height: 1.6; color: #1d1d1f; }
+    .legal ul { padding-left: 1.2em; }
+    .legal li + li { margin-top: 8px; }
+    .legal a { color: #e50914; }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="/" aria-label="CineView home">
+      <img src="/assets/wordmark.png?v=4" alt="CineView" width="132" height="30">
+    </a>
+    <nav aria-label="Main">
+      <a href="/#how">How it works</a>
+      <a href="/#install">Install</a>
+    </nav>
+  </header>
+
+  <main class="legal">
+    <h1>Privacy policy</h1>
+    <p class="updated">Last updated 14 November 2026</p>
+
+    <p>CineView is a free, open-source Chrome extension that shows you the cinema screen from a seat you pick on District or BookMyShow, with the film's trailer playing. CineView does not collect, store on any server, sell or share your personal data. There are no accounts, ads, analytics or tracking.</p>
+
+    <h2>What the extension reads</h2>
+    <p>When you open the preview on a District or BookMyShow seat-selection page, CineView reads that page in your browser: the seat layout, which seats are booked or selected, the film title, and the showtime label (for example "IMAX"). It uses this only to draw the preview. None of it leaves your device, except the film title as described below.</p>
+
+    <h2>What the extension sends</h2>
+    <ul>
+      <li><strong>YouTube.</strong> To find the official trailer, CineView sends the film title (with the language and year when the page shows them) to YouTube. It checks candidate videos with YouTube's public oEmbed service. No cookies are sent with these lookups.</li>
+      <li><strong>The trailer player.</strong> The trailer plays in YouTube's privacy-enhanced embedded player (youtube-nocookie.com). YouTube's own <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">privacy policy</a> applies to that player.</li>
+      <li><strong>YouTube Data API (optional).</strong> If you add your own YouTube API key in the extension's options, trailer searches go to Google's YouTube Data API with that key instead.</li>
+    </ul>
+
+    <h2>What is stored on your device</h2>
+    <p>CineView uses Chrome's extension storage to keep your theatre settings (such as screen format and row spacing), your optional API key, and a short-lived cache of trailer search results, so the same film doesn't have to be looked up again. Settings may sync between your own Chrome browsers if you use Chrome sync. Uninstalling CineView deletes all of it.</p>
+
+    <h2>Permissions</h2>
+    <ul>
+      <li><strong>Access to district.in and bookmyshow.com:</strong> to read the seat layout and film details on those pages.</li>
+      <li><strong>Access to youtube.com and googleapis.com:</strong> to find and check the trailer.</li>
+      <li><strong>Storage:</strong> to save your settings and the trailer cache.</li>
+      <li><strong>Active tab and scripting:</strong> so the toolbar button can open the preview on the page you're viewing.</li>
+    </ul>
+
+    <h2>This website</h2>
+    <p>cineview-ten.vercel.app has no analytics and sets no cookies of its own. It's hosted on Vercel, which keeps standard server logs. The live demo plays trailers through YouTube's privacy-enhanced player.</p>
+
+    <h2>Children</h2>
+    <p>CineView is not directed at children and does not knowingly collect information from anyone.</p>
+
+    <h2>Changes and contact</h2>
+    <p>If this policy changes, the new version will be posted on this page with a new date. The extension's source code is public on <a href="https://github.com/Bharathshiva24/CineView" target="_blank" rel="noopener">GitHub</a>. For questions, open an issue there.</p>
+  </main>
+
+  <footer class="foot">
+    <img src="/assets/wordmark.png?v=4" alt="CineView" width="160" height="36">
+    <p>Made for people who care where they sit.</p>
+    <nav aria-label="Footer">
+      <a href="https://github.com/Bharathshiva24/CineView" target="_blank" rel="noopener">GitHub</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/#install">Install</a>
+    </nav>
+  </footer>
+</body>
+</html>
