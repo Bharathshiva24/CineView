@@ -18,6 +18,7 @@
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/fx/fx.css">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -39,7 +40,7 @@
     <!-- Hero -->
     <section class="hero">
       <div class="hero-copy">
-        <h1>See the screen from your seat.</h1>
+        <h1 data-masked>See the screen from your seat.</h1>
         <p class="lede">CineView is a free Chrome extension for District and BookMyShow. Pick a seat, click CineView, and watch the movie's trailer on the screen exactly as you'd see it from that row.</p>
         <div class="actions">
           <a class="btn btn-red" href="/downloads/cineview-v2.4.4.zip" download data-download>Download for Chrome</a>
@@ -141,8 +142,19 @@
       </div>
     </section>
 
+    <!-- Admit one: tear the ticket -->
+    <section class="ticket" aria-labelledby="ticket-title">
+      <div class="ticket-copy">
+        <h2 id="ticket-title">Pick the seat. Then tear the ticket.</h2>
+        <p>CineView shows you the view before you pay, so the only surprise at the cinema is the film. Go on, drag the stub to tear it off.</p>
+        <p class="ticket-note" aria-live="polite"></p>
+      </div>
+      <div class="ticket-host" data-ticket></div>
+    </section>
+
     <!-- Install (dark: house lights down) -->
     <section class="install" id="install" aria-labelledby="install-title">
+      <div class="install-bg" data-ascii aria-hidden="true"></div>
       <div class="install-inner">
         <div class="install-head">
           <h2 id="install-title">Install CineView in under a minute.</h2>
@@ -208,6 +220,8 @@
     </section>
   </main>
 
+  <div class="bigmark" data-techtext></div>
+
   <footer class="foot">
     <img src="/assets/wordmark.png?v=4" alt="CineView" width="160" height="36">
     <p>Made for people who care where they sit.</p>
@@ -218,11 +232,16 @@
       <a href="/privacy">Privacy</a>
       <a href="https://buymeacoffee.com/bharathshiva" target="_blank" rel="noopener">Buy me a coffee</a>
     </nav>
-    <p class="credits">Link preview image: <a href="https://mango.blender.org" target="_blank" rel="noopener">Tears of Steel</a> © Blender Foundation, <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener">CC BY 3.0</a>. Trailers play from the studios' official YouTube channels.</p>
+    <p class="credits">Headline footage, ticket art and link preview from <a href="https://studio.blender.org/films/" target="_blank" rel="noopener">Sintel, Tears of Steel and Big Buck Bunny</a> © Blender Foundation, <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener">CC BY 3.0</a>. Trailers play from the studios' official YouTube channels. Effects adapted from <a href="https://reactbits.dev" target="_blank" rel="noopener">React Bits</a> (<a href="/fx/LICENSE-react-bits.txt" target="_blank" rel="noopener">MIT + Commons Clause</a>).</p>
   </footer>
 
   <div class="toast" role="status" aria-live="polite"></div>
+  <script src="/fx/gradient-ascii.js" defer></script>
+  <script src="/fx/tech-text.js" defer></script>
+  <script src="/fx/masked-heading.js" defer></script>
+  <script src="/fx/tear-ticket.js" defer></script>
   <script src="/main.js" defer></script>
+  <script src="/fx/init.js" defer></script>
   <script src="/demo.js" defer></script>
 </body>
 </html>

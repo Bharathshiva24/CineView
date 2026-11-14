@@ -251,3 +251,43 @@ section { scroll-margin-top: 80px; }
 /* Footer credits line */
 .foot .credits { grid-column: 1 / -1; flex-basis: 100%; max-width: none; margin: 8px 0 0; font-size: .8rem; color: var(--seat); }
 .foot .credits a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+
+/* ---------- Effects (React Bits ports, /fx) ---------- */
+/* Hero headline: footage shows through the letters; keep the original type size and width */
+.hero h1.masked-heading { width: auto; max-width: 13ch; color: var(--ink); }
+.masked-heading__media { background: #1B1718; }
+
+/* Install: ASCII screen glow behind the content */
+.install { position: relative; overflow: hidden; isolation: isolate; }
+.install-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.install-inner { position: relative; z-index: 1; }
+
+/* Admit one */
+.ticket { max-width: var(--max); margin: clamp(96px, 12vw, 160px) auto 0; padding: 0 clamp(20px, 4vw, 48px);
+  display: grid; grid-template-columns: 5fr 6fr; gap: clamp(40px, 6vw, 96px); align-items: center; }
+.ticket > * { min-width: 0; }
+.ticket-copy p { color: var(--seat); margin: 20px 0 0; max-width: 46ch; }
+.ticket-copy .ticket-note { color: var(--ink); font-weight: 600; min-height: 1.6em; }
+.ticket-again { margin-left: 10px; font: inherit; font-weight: 600; color: var(--red); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.ticket-host { display: flex; justify-content: center; padding: 24px 0; }
+.ticket-host .tear-ticket { margin: 0 auto; }
+.tk-body { position: absolute; left: 22px; right: 18px; bottom: 18px; }
+.tk-kicker { margin: 0; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.6); }
+.tk-title { margin: 2px 0 10px; font-size: 26px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; }
+.tk-meta { display: flex; gap: 22px; margin: 0; }
+.tk-meta div { display: grid; gap: 1px; }
+.tk-meta dt { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.5); }
+.tk-meta dd { margin: 0; font-size: 16px; font-weight: 700; }
+.tk-meta div:last-child dd { color: #34c759; }
+.tk-stub { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 6px; text-align: center; }
+.tk-stub-label { font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: rgba(255,255,255,.6); }
+.tk-stub-seat { font-size: 44px; font-weight: 800; letter-spacing: -0.03em; color: var(--red); line-height: 1; }
+.tk-stub-hint { font-size: 11px; color: rgba(255,255,255,.45); }
+
+/* Big interactive wordmark above the footer */
+.bigmark { max-width: var(--max); margin: clamp(96px, 12vw, 150px) auto 0; height: clamp(150px, 22vw, 320px); padding: 0 clamp(20px, 4vw, 48px); color: var(--ink); }
+.bigmark + .foot { margin-top: 0; }
+
+@media (max-width: 860px) {
+  .ticket { grid-template-columns: 1fr; }
+}

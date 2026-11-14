@@ -4,6 +4,14 @@ All notable changes to CineView. Versions follow [Semantic Versioning](https://s
 Every version is archived as a ready-to-load zip in [`releases/`](releases/) and tagged in git (`vX.Y.Z`).
 
 ## Website update (2026-11-14)
+- Four effects adapted from React Bits (ported to plain JavaScript, no React; MIT + Commons Clause notice in /fx):
+  - Masked heading: the hero headline shows open-movie footage (Sintel, Tears of Steel) drifting inside the letters, revealed word by word.
+  - Gradient ASCII: a cinema-screen glow drawn in ASCII behind the install section; it scrambles under the cursor.
+  - Tear ticket: a new "Pick the seat. Then tear the ticket." section with an admit-one ticket whose stub tears off.
+  - Tech text: a large interactive CineView wordmark above the footer.
+- The live demo and screen-format sections are unchanged. Footer credits updated for the film footage and React Bits.
+
+## Website update (2026-11-14)
 - New link-preview (Open Graph) image: "See the screen from your seat." beside a Tears of Steel frame (© Blender Foundation, CC BY 3.0), with the film credit on the image and in the footer. Image version bumped to ?v=6 so social sites fetch the new one.
 
 ## Website update (2026-11-14)
