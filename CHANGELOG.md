@@ -3,6 +3,10 @@
 All notable changes to CineView. Versions follow [Semantic Versioning](https://semver.org): **MAJOR.MINOR.PATCH**.
 Every version is archived as a ready-to-load zip in [`releases/`](releases/) and tagged in git (`vX.Y.Z`).
 
+## Website update (2026-11-14)
+- "Buy me a coffee" is now the secondary button beside Download in the hero (replacing "View source on GitHub", which stays in the footer) and under Download in the install section, styled quietly so Download stays the main action.
+- Install section now reads: "We're currently under review and will be available on the Chrome Web Store soon. Stay tuned!"
+
 ## v2.4.4 (2026-11-14)
 - Added a "Buy me a coffee" link (https://buymeacoffee.com/bharathshiva) to the toolbar popup, the options page and the bottom of the preview's Theatre settings.
 - The Chrome Web Store is reviewing v2.4.3; this version goes to the store as an update once that's approved.
