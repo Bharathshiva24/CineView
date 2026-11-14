@@ -72,6 +72,9 @@ function filterAndRank(list, movieTitle, lang) {
 // ---------- main ----------
 async function findTrailer({ title, lang = '', ids = [] }) {
   title = (title || '').trim();
+  // "Jailer 2 - Tamil" / "Coolie (Telugu)": the language is a hint, not part of the title
+  const langSuffix = title.match(/\s*(?:[-–—|:·•,]\s*\(?|\()\s*(hindi|tamil|telugu|malayalam|kannada|english|bengali|marathi|punjabi|gujarati|odia)\s*\)?\s*$/i);
+  if (langSuffix && langSuffix.index > 0) { title = title.slice(0, langSuffix.index).trim(); if (!lang) lang = langSuffix[1]; }
   if (!title) return [];
   const cacheKey = `yt:${CACHE_VERSION}:${title.toLowerCase()}|${lang.toLowerCase()}|${ids.join(',')}`;
   const cached = (await chrome.storage.local.get(cacheKey))[cacheKey];

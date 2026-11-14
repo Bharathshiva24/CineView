@@ -238,7 +238,40 @@
     }));
     seats = classify(seats);
     if (seats.length < 12) return null;
+    return buildLayout(seats);
+  };
 
+  // Seats drawn on a Konva canvas (BookMyShow's newer seat layout). konva-bridge.js runs in the page and reads the
+  // seat objects; here they become the same seat list the DOM reader produces.
+  CV.readKonvaSeats = function (timeoutMs = 400) {
+    return new Promise((resolve) => {
+      let done = false;
+      const onRes = (e) => {
+        if (done) return; done = true;
+        document.removeEventListener('cineview:konva-response', onRes);
+        try { resolve(JSON.parse(e.detail)); } catch (_) { resolve(null); }
+      };
+      document.addEventListener('cineview:konva-response', onRes);
+      document.dispatchEvent(new CustomEvent('cineview:konva-request'));
+      setTimeout(() => { if (!done) { done = true; document.removeEventListener('cineview:konva-response', onRes); resolve(null); } }, timeoutMs);
+    });
+  };
+
+  CV.detectKonvaLayout = async function () {
+    const data = await CV.readKonvaSeats();
+    if (!data || !data.seats || data.seats.length < 12) return null;
+    const seats = data.seats.map((k, i) => ({
+      id: i, el: null, text: k.label, label: k.label, rowLabel: k.row,
+      cx: k.x + k.w / 2, cy: k.y + k.h / 2, w: k.w, h: k.h,
+      status: k.selected ? 'selected' : k.available ? 'available' : 'occupied'
+    }));
+    const ys = seats.map((s) => s.cy);
+    let screenSide = 'bottom';
+    if (data.screenY != null) screenSide = data.screenY < Math.min(...ys) ? 'top' : 'bottom';
+    return buildLayout(seats, { screenSide });
+  };
+
+  function buildLayout(seats, opts = {}) {
     const seatH = median(seats.map((s) => s.h));
     const seatW = median(seats.map((s) => s.w));
 
@@ -254,7 +287,7 @@
     const minY = rowsByY[0].y, maxY = rowsByY[rowsByY.length - 1].y;
     const minX = Math.min(...seats.map((s) => s.cx));
     const maxX = Math.max(...seats.map((s) => s.cx));
-    const screenSide = findScreenSide(minY, maxY, (minX + maxX) / 2);
+    const screenSide = opts.screenSide || findScreenSide(minY, maxY, (minX + maxX) / 2);
 
     const rows = screenSide === 'bottom' ? [...rowsByY].reverse() : rowsByY; // rows[0] = closest to screen
     const gaps = [];
@@ -293,7 +326,9 @@
       if (best) s.label = best.label;
     }
 
-    findRowLabels(rows, seatH, minX - seatW / 2, maxX + seatW / 2);
+    // Seats that carry their own row letter (canvas layouts) label their row directly
+    rows.forEach((row) => { const l = row.seats.find((s) => s.rowLabel); if (l) row.label = l.rowLabel; });
+    if (rows.some((r) => !r.label)) findRowLabels(rows.filter((r) => !r.label), seatH, minX - seatW / 2, maxX + seatW / 2);
     rows.forEach((row, i) => { if (!row.label) row.label = String(i + 1); });
 
     return {
@@ -307,7 +342,7 @@
       screenSide,
       synthetic: false
     };
-  };
+  }
 
   // Fallback when the seat map can't be read (canvas-rendered maps, unknown sites)
   CV.syntheticLayout = function (rowCount = 14, perRow = 22) {

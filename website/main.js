@@ -81,7 +81,7 @@
   // After a download starts, point people to the install steps
   document.querySelectorAll('[data-download]').forEach((a) => {
     a.addEventListener('click', () => {
-      show('Downloading CineView 2.4.2. Follow the four install steps below.');
+      show('Downloading CineView 2.4.3. Follow the four install steps below.');
       if (!a.closest('#install')) setTimeout(() => document.getElementById('install').scrollIntoView({ behavior: 'smooth' }), 400);
     });
   });

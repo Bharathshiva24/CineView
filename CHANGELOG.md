@@ -3,6 +3,11 @@
 All notable changes to CineView. Versions follow [Semantic Versioning](https://semver.org): **MAJOR.MINOR.PATCH**.
 Every version is archived as a ready-to-load zip in [`releases/`](releases/) and tagged in git (`vX.Y.Z`).
 
+## v2.4.3 (2026-11-14)
+- BookMyShow's newer seat layout (drawn on a canvas with Konva) is now read directly: real rows, seat numbers, booked seats, section breaks and your selected seats, instead of falling back to a typical hall. A small page script (`content/konva-bridge.js`) reads the seat objects and never changes the page. Needs Chrome 111 or later.
+- Trailer search ignores a language suffix in the title ("Jailer 2 - Tamil", "Coolie (Telugu)") and uses it as the language hint instead, so these films find their trailer.
+- Notices now appear below the top pills instead of under the format pill.
+
 ## Website update — mobile fixes (2026-11-14)
 - Hero live demo now shows on iPhone Safari: the stage is sized in pixels instead of relying on `aspect-ratio`.
 - Hero hall is now drawn on canvas with the same camera maths, so iPhone Safari renders it exactly like Chrome (CSS 3D drew the seats and the trailer at the wrong size there). The trailer sits in a flat layer placed exactly where the screen projects.

@@ -106,7 +106,7 @@
   .fmtmenu .fi i { width: 16px; height: 16px; }
   .fmtmenu .fi b { font-weight: 500; } .fmtmenu .fi b em { font-style: normal; font-size: 10px; font-weight: 600; color: #30d158; margin-left: 6px; letter-spacing: .03em; }
   .fmtmenu .fi small { color: rgba(235,235,245,.5); font-variant-numeric: tabular-nums; }
-  .toast { position: absolute; left: 50%; top: 16px; transform: translate(-50%, -8px); opacity: 0; padding: 8px 14px; border-radius: 12px;
+  .toast { position: absolute; left: 50%; top: 64px; white-space: normal; z-index: 5; transform: translate(-50%, -8px); opacity: 0; padding: 8px 14px; border-radius: 12px;
     font-weight: 500; pointer-events: none; transition: opacity .3s ease, transform .4s ${EASE}; max-width: 70%; text-align: center; }
   .toast.show { opacity: 1; transform: translate(-50%, 0); }
 

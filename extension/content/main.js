@@ -25,6 +25,7 @@
       .replace(/\b(movie\s+tickets?|seat\s+layout|select\s+seats?|online|showtimes?)\b/gi, '')
       .replace(/\((u|ua|u\/a|a|s|ua\s?\d+\+?|\d+\+)\)/gi, '')
       .replace(/\b(2d|3d|4dx|imax|mx4d|screenx|ice|dolby\s+atmos|dolby\s+cinema|epiq|playhouse)\b/gi, '')
+      .replace(new RegExp('\\s*(?:[-–—|:·•,]\\s*|\\()(' + LANGS.join('|') + ')(\\s*\\))?\\s*$', 'i'), '')
       .replace(/\s{2,}/g, ' ').replace(/[\s,:\-|·•]+$/, '').replace(/^[\s,:\-|·•]+/, '').trim();
     if (s.length < 1 || s.length > 80 || JUNK_RE.test(s) || SHOW_LINE_RE.test(s) || /₹|\btickets?\b/i.test(s)) return '';
     return s;
@@ -233,7 +234,10 @@
   // ---------- open / close ----------
   async function openPreview() {
     if (CV.Overlay.isOpen()) { CV.Overlay.close(); return; }
-    let layout = CV.detectLayout();
+    // Canvas seat maps (BookMyShow's newer layout) first, then the DOM reader
+    let layout = null;
+    try { layout = await CV.detectKonvaLayout(); } catch (_) { layout = null; }
+    if (!layout) layout = CV.detectLayout();
     let message = '';
     if (!layout) {
       layout = CV.syntheticLayout();
