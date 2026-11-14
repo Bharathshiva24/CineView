@@ -165,10 +165,15 @@
   }
 
   // Booked seats often show an icon instead of their number – infer it from labelled neighbours
-  function inferSeatNumbers(rowSeats) {
+  function rowDirection(rowSeats) {
+    const known = rowSeats.map((s) => parseInt(s.text, 10)).filter((n) => !isNaN(n));
+    return known.length >= 2 ? (known[known.length - 1] >= known[0] ? 1 : -1) : 0;
+  }
+
+  function inferSeatNumbers(rowSeats, defaultDir = 1) {
     const known = rowSeats.map((s, i) => ({ i, n: parseInt(s.text, 10) })).filter((k) => !isNaN(k.n));
     if (!known.length) return;
-    let dir = 1;
+    let dir = defaultDir;
     if (known.length >= 2) dir = known[known.length - 1].n >= known[0].n ? 1 : -1;
     rowSeats.forEach((s, i) => {
       if (s.label) return;
@@ -266,8 +271,10 @@
       row.depth = depth;
       row.seats.sort((a, b) => a.cx - b.cx);
       for (const s of row.seats) s.row = i;
-      inferSeatNumbers(row.seats);
     });
+    // Numbering direction (left→right ascending or descending) from rows that show at least two numbers
+    const dirVotes = rows.map((r) => rowDirection(r.seats)).reduce((a, d) => a + d, 0);
+    rows.forEach((row) => inferSeatNumbers(row.seats, dirVotes < 0 ? -1 : 1));
 
     // Horizontal seat pitch
     const dx = [];
@@ -276,6 +283,15 @@
       if (d > seatW * 0.8) dx.push(d);
     }
     const seatPitchPx = median(dx) || seatW * 1.25;
+
+    // Rows where every seat is booked have no visible numbers: borrow the number of the seat in the same column
+    const labelled = seats.filter((s) => s.label);
+    for (const s of seats) {
+      if (s.label) continue;
+      let best = null;
+      for (const o of labelled) if (Math.abs(o.cx - s.cx) < seatW * 0.5 && (!best || Math.abs(o.cy - s.cy) < Math.abs(best.cy - s.cy))) best = o;
+      if (best) s.label = best.label;
+    }
 
     findRowLabels(rows, seatH, minX - seatW / 2, maxX + seatW / 2);
     rows.forEach((row, i) => { if (!row.label) row.label = String(i + 1); });
