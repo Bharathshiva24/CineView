@@ -48,10 +48,17 @@ Seat maps are flat grids. They don't show how big the screen will look, whether 
 
 ## Install
 
-1. Download CineView from the website, [cineview-ten.vercel.app](https://cineview-ten.vercel.app), or get the latest zip from [`releases/`](releases/) (`cineview-v2.4.4.zip`). Unzip it. Or clone the repo: `git clone https://github.com/Bharathshiva24/CineView.git`.
+**[Add CineView to Chrome from the Chrome Web Store](https://chromewebstore.google.com/detail/pmccaejammpjhefgpalbbfdmohkklihi)**. It's free and updates automatically. Works in Chrome, Edge, Brave and Arc.
+
+<details>
+<summary>Install manually instead</summary>
+
+1. Download the zip from [cineview-ten.vercel.app](https://cineview-ten.vercel.app) or [`releases/`](releases/) (`cineview-v2.4.4.zip`) and unzip it. Or clone the repo: `git clone https://github.com/Bharathshiva24/CineView.git`.
 2. Open `chrome://extensions` and turn on **Developer mode**.
 3. Click **Load unpacked** and choose the folder that contains `manifest.json`: the unzipped `cineview-v2.4.4` folder, or `extension/` in a clone.
 4. Pin **CineView** to the toolbar.
+
+</details>
 
 ## Use
 

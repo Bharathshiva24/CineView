@@ -4,6 +4,9 @@ All notable changes to CineView. Versions follow [Semantic Versioning](https://s
 Every version is archived as a ready-to-load zip in [`releases/`](releases/) and tagged in git (`vX.Y.Z`).
 
 ## Website update (2026-11-14)
+- CineView is live on the Chrome Web Store (https://chromewebstore.google.com/detail/pmccaejammpjhefgpalbbfdmohkklihi). The nav, hero and install buttons are now "Add to Chrome" and open the store listing; the zip and manual steps stay available as a secondary option. README updated to match.
+
+## Website update (2026-11-14)
 - Four effects adapted from React Bits (ported to plain JavaScript, no React; MIT + Commons Clause notice in /fx):
   - Masked heading: the hero headline shows open-movie footage (Sintel, Tears of Steel) drifting inside the letters, revealed word by word.
   - Gradient ASCII: a cinema-screen glow drawn in ASCII behind the install section; it scrambles under the cursor.
