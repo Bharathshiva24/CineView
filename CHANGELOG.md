@@ -5,7 +5,7 @@ Every version is archived as a ready-to-load zip in [`releases/`](releases/) and
 
 ## Website update — mobile fixes (2026-11-14)
 - Hero live demo now shows on iPhone Safari: the stage is sized in pixels instead of relying on `aspect-ratio`.
-- Hero trailer now keeps the hall's perspective on iPhone: the video sits in a flat layer placed exactly where the 3D screen projects, instead of inside the 3D scene (iOS Safari draws iframes there at full size).
+- Hero hall is now drawn on canvas with the same camera maths, so iPhone Safari renders it exactly like Chrome (CSS 3D drew the seats and the trailer at the wrong size there). The trailer sits in a flat layer placed exactly where the screen projects.
 - Screen-format demo now resizes the trailer screen for each format (Scope, IMAX, Widescreen, 16:9) on mobile; all formats share one base width so IMAX reads taller, not just bigger.
 
 ## v2.4.2 — 2026-11-14

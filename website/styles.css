@@ -86,7 +86,7 @@ kbd { border: 1px solid var(--line); }
 .demo { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: stretch; }
 .demo-stage { position: relative; min-width: 0; min-height: 460px; border-radius: 20px; overflow: hidden; background: #050506; isolation: isolate;
   box-shadow: 0 40px 80px -30px rgba(27,23,24,.45); perspective-origin: 50% 50%; }
-.cam, .g { position: absolute; inset: 0; transform-style: preserve-3d; transform-origin: 50% 50%; }
+.hall { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 /* The trailer sits in a flat layer between the hall and the seat rows: iOS Safari can't draw an iframe inside a 3D scene */
 .flat-screen { position: absolute; inset: 0; pointer-events: none; }
 .flat-screen .vid { inset: auto; }

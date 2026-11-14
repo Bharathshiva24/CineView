@@ -52,84 +52,172 @@
     return { x, y, z, h, v, off, dist: z, score, verdict, headline, cy };
   }
 
-  // ---------- 3D stage ----------
+  // ---------- 3D stage (drawn on canvas so every browser, including iOS Safari, renders it the same) ----------
   const stage = document.querySelector('.demo-stage');
   if (!stage) return;
-  const cams = [...stage.querySelectorAll('.cam')], flat = stage.querySelector('.flat-screen .vid'), env = stage.querySelector('.env'), rowsG = stage.querySelector('.rows'), scr = stage.querySelector('.screen');
-  const el = (cls) => { const d = document.createElement('div'); d.className = 'p ' + cls; return d; };
-  function place(node, w, h, x, y, z, extra = '') {
-    node.style.width = w * PX + 'px'; node.style.height = h * PX + 'px';
-    node.style.marginLeft = (-w * PX) / 2 + 'px'; node.style.marginTop = (-h * PX) / 2 + 'px';
-    node.style.transform = `translate3d(${x * PX}px, ${-y * PX}px, ${z * PX}px) ${extra}`;
-    return node;
+  const backC = stage.querySelector('canvas.hall-back'), frontC = stage.querySelector('canvas.hall-front');
+  const flat = stage.querySelector('.flat-screen .vid');
+  let scene = { env: [], rows: [], cy: 0 };
+
+  // A flat panel in world metres. orient: '' faces the viewer, 'x' lies flat (floor/ceiling), 'y' is a side wall.
+  function panel(cls, w, h, x, y, z, orient = '', shape = 'rect') {
+    let local;
+    if (shape === 'seat') {
+      // rounded top corners, slightly rounded bottom (matches the old CSS border-radius)
+      const rx = w * 0.34, ry = h * 0.24, bx = w * 0.1, by = h * 0.06, pts = [];
+      const arc = (cx, cy, ax, ay, a0, a1) => { for (let i = 0; i <= 5; i++) { const a = a0 + ((a1 - a0) * i) / 5; pts.push([cx + ax * Math.cos(a), cy + ay * Math.sin(a)]); } };
+      const hw = w / 2, hh = h / 2;
+      arc(-hw + rx, hh - ry, rx, ry, Math.PI, Math.PI / 2);
+      arc(hw - rx, hh - ry, rx, ry, Math.PI / 2, 0);
+      arc(hw - bx, -hh + by, bx, by, 0, -Math.PI / 2);
+      arc(-hw + bx, -hh + by, bx, by, -Math.PI / 2, -Math.PI);
+      local = pts;
+    } else if (shape === 'circle') {
+      local = Array.from({ length: 20 }, (_, i) => [(w / 2) * Math.cos((i / 20) * 2 * Math.PI), (h / 2) * Math.sin((i / 20) * 2 * Math.PI)]);
+    } else local = [[-w / 2, h / 2], [w / 2, h / 2], [w / 2, -h / 2], [-w / 2, -h / 2]];
+    const map = orient === 'x' ? ([u, v]) => [x + u, y, z + v] : orient === 'y' ? ([u, v]) => [x, y + v, z + u] : ([u, v]) => [x + u, y + v, z];
+    return { cls, pts: local.map(map), w, h, x, y, z, orient };
   }
-  const add = (parent, cls, ...a) => parent.appendChild(place(el(cls), ...a));
 
   function render(instant) {
     const m = metrics(seat);
-    const W = stage.clientWidth || 800;
-    const P = W / 2 / Math.tan((FOV * RAD) / 2);
     const aimY = m.cy - Math.min(Math.max(SCREEN_H * 0.3, 0.9), 1.9);
     const dx = -m.x, dy = -(aimY - m.y), dz = -m.z;
     const yaw = Math.atan2(dx, -dz);
     const dz2 = -dx * Math.sin(yaw) + dz * Math.cos(yaw);
     const pitch = Math.atan2(-dy, -dz2);
-    stage.style.perspective = P + 'px';
-    moveCamera({ x: m.x, y: m.y, z: m.z, yaw, pitch, cy: m.cy }, instant);
 
-    place(scr, SCREEN_W, SCREEN_H, 0, m.cy, 0);
     const H = Math.max(SCREEN_BOTTOM + SCREEN_H + 2.4, 7.5);
     const end = Math.max(0.6, m.z - 1.2);
-    env.textContent = '';
-    add(env, 'frontwall', HALL + 2, H + 1, 0, H / 2, -0.15);
+    const env = [];
+    env.push(panel('frontwall', HALL + 2, H + 1, 0, H / 2, -0.15));
     const side = (HALL - SCREEN_W) / 2 - 0.3;
     for (const sg of [-1, 1]) {
-      add(env, 'drape', side, H, sg * (SCREEN_W / 2 + 0.3 + side / 2), H / 2, -0.1);
-      add(env, 'wall', end, H, (sg * HALL) / 2, H / 2, end / 2, `rotateY(${sg * -90}deg)`);
-      for (let z = 3; z < end - 0.5; z += 4.5) add(env, 'glow', 1.6, 1.6, (sg * HALL) / 2 - sg * 0.02, 3.1, z, `rotateY(${sg * -90}deg)`);
+      // drapes as vertical folds
+      const x0 = sg * (SCREEN_W / 2 + 0.3), n = Math.max(2, Math.round(side / 0.4));
+      for (let i = 0; i < n; i++) { const pw = side / n; env.push(panel(i % 3 === 1 ? 'drape2' : i % 3 === 2 ? 'drape3' : 'drape', pw + 0.01, H, x0 + sg * (pw * i + pw / 2), H / 2, -0.1)); }
     }
-    add(env, 'ceiling', HALL, end, 0, H, end / 2, 'rotateX(90deg)');
+    env.push(panel('ceiling', HALL, end, 0, H, end / 2, 'x'));
     const ff = Math.min(FIRST_ROW - ROW_PITCH / 2, m.z - 0.8);
-    if (ff > 0.2) add(env, 'floor', HALL, ff, 0, 0, ff / 2, 'rotateX(90deg)');
+    if (ff > 0.2) env.push(panel('floor', HALL, ff, 0, 0, ff / 2, 'x'));
+    for (const sg of [-1, 1]) {
+      env.push(panel('wall', end, H, (sg * HALL) / 2, H / 2, end / 2, 'y'));
+      for (let z = 3; z < end - 0.5; z += 4.5) env.push(panel('glow', 1.6, 1.6, (sg * HALL) / 2 - sg * 0.02, 3.1, z, 'y', 'circle'));
+    }
+    env.push(panel('screen', SCREEN_W, SCREEN_H, 0, m.cy, 0));
 
-    rowsG.textContent = '';
+    const rows = [];
     for (let r = 0; r < seat.row; r++) {
       const zr = rowZ(r), fl = rowFloor(r);
       if (m.z - zr < 0.6) continue;
       const t0 = zr - ROW_PITCH / 2, t1 = Math.min(zr + ROW_PITCH / 2, m.z - 0.5);
-      add(rowsG, 'tread', HALL, t1 - t0, 0, fl, (t0 + t1) / 2, 'rotateX(90deg)');
-      if (r > 0) add(rowsG, 'riser', HALL, RISER, 0, fl - RISER / 2, t0);
-      for (let c = 1; c <= COLS; c++) add(rowsG, 'seatback', SEAT_W * 0.82, 0.7, seatX(c), fl + 0.63, zr + 0.32);
+      if (r > 0) rows.push(panel('riser', HALL, RISER, 0, fl - RISER / 2, t0));
+      rows.push(panel('tread', HALL, t1 - t0, 0, fl, (t0 + t1) / 2, 'x'));
+      // centre seats last so they overlap the outer ones naturally
+      const cols = Array.from({ length: COLS }, (_, i) => i + 1).sort((a, b) => Math.abs(seatX(b) - m.x) - Math.abs(seatX(a) - m.x));
+      for (const c of cols) rows.push(panel('seatback', SEAT_W * 0.82, 0.7, seatX(c), fl + 0.63, zr + 0.32, '', 'seat'));
     }
-    sizeVideos();
+    scene = { env, rows, cy: m.cy };
+    moveCamera({ x: m.x, y: m.y, z: m.z, yaw, pitch }, instant);
     renderPanel(m);
   }
 
   // ---------- Camera ----------
-  // Both 3D layers share one camera; the flat trailer layer is placed where the screen projects.
   let camNow = null, camAnim = 0;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const NEAR = 8; // px in front of the eye; geometry closer than this is clipped
+
+  function viewer(c, W) {
+    const P = W / 2 / Math.tan((FOV * RAD) / 2);
+    const cyw = Math.cos(c.yaw), syw = Math.sin(c.yaw), cp = Math.cos(c.pitch), sp = Math.sin(c.pitch);
+    // camera space: same order CSS used (translate, rotateY, rotateX); depth z < 0 is in front of the eye
+    const toCam = ([X, Y, Z]) => {
+      let x = (X - c.x) * PX, y = (c.y - Y) * PX, z = (Z - c.z) * PX;
+      [x, z] = [x * cyw + z * syw, -x * syw + z * cyw];
+      [y, z] = [y * cp - z * sp, y * sp + z * cp];
+      return [x, y, z];
+    };
+    return { P, toCam };
+  }
+  function clipNear(poly) {
+    const out = [];
+    for (let i = 0; i < poly.length; i++) {
+      const a = poly[i], b = poly[(i + 1) % poly.length];
+      const ia = a[2] <= -NEAR, ib = b[2] <= -NEAR;
+      if (ia) out.push(a);
+      if (ia !== ib) { const t = (-NEAR - a[2]) / (b[2] - a[2]); out.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, -NEAR]); }
+    }
+    return out;
+  }
+
+  const FILL = { frontwall: '#0d0d10', drape: '#121214', drape2: '#1a1a1e', drape3: '#0e0e10', wall: '#0e0e11', ceiling: '#050506', floor: '#08080a', tread: '#0d0d10', riser: '#060607', screen: '#000' };
+  function drawLayer(canvas, list, c, W, H) {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    if (canvas.width !== Math.round(W * dpr) || canvas.height !== Math.round(H * dpr)) { canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr); }
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    const { P, toCam } = viewer(c, W);
+    const project = ([x, y, z]) => { const f = P / -z; return [W / 2 + x * f, H / 2 + y * f]; };
+    const projPt = (p) => { const q = toCam(p); return q[2] <= -NEAR ? project(q) : null; };
+    for (const it of list) {
+      const poly = clipNear(it.pts.map(toCam));
+      if (poly.length < 3) continue;
+      const pts = poly.map(project);
+      ctx.beginPath(); pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.closePath();
+      ctx.save();
+      if (it.cls === 'seatback') {
+        const a = projPt([it.x, it.y + it.h / 2, it.z]), b = projPt([it.x, it.y - it.h / 2, it.z]);
+        if (a && b) {
+          const g = ctx.createLinearGradient(a[0], a[1], b[0], b[1]);
+          g.addColorStop(0, '#2b2b31'); g.addColorStop(0.3, '#212126'); g.addColorStop(0.75, '#17171b'); g.addColorStop(1, '#101012');
+          ctx.fillStyle = g;
+        } else ctx.fillStyle = '#1a1a1e';
+        ctx.fill();
+      } else if (it.cls === 'glow') {
+        const ctr = projPt([it.x, it.y, it.z]);
+        if (ctr) {
+          const r = Math.max(...pts.map(([x, y]) => Math.hypot(x - ctr[0], y - ctr[1])));
+          const g = ctx.createRadialGradient(ctr[0], ctr[1], 0, ctr[0], ctr[1], r);
+          g.addColorStop(0, 'rgba(255,214,170,.42)'); g.addColorStop(0.62, 'rgba(255,200,150,.06)'); g.addColorStop(1, 'rgba(255,200,150,0)');
+          ctx.fillStyle = g; ctx.fill();
+        }
+      } else if (it.cls === 'frontwall') {
+        const ctr = projPt([0, scene.cy, -0.15]);
+        const xs = pts.map((p) => p[0]);
+        if (ctr) {
+          const g = ctx.createRadialGradient(ctr[0], ctr[1], 0, ctr[0], ctr[1], (Math.max(...xs) - Math.min(...xs)) * 0.55);
+          g.addColorStop(0, '#18181c'); g.addColorStop(1, '#0a0a0c'); ctx.fillStyle = g;
+        } else ctx.fillStyle = FILL.frontwall;
+        ctx.fill();
+      } else if (it.cls === 'screen') {
+        ctx.shadowColor = 'rgba(170,180,255,.22)'; ctx.shadowBlur = Math.min(120, W * 0.12);
+        ctx.fillStyle = '#000'; ctx.fill();
+        ctx.shadowBlur = 0; ctx.lineWidth = Math.max(2, W / 120); ctx.strokeStyle = '#020203'; ctx.stroke();
+      } else {
+        ctx.fillStyle = FILL[it.cls] || '#0a0a0c'; ctx.fill();
+        if (it.cls === 'riser') {
+          const a = projPt([-it.w / 2, it.y + it.h / 2, it.z]), b = projPt([it.w / 2, it.y + it.h / 2, it.z]);
+          if (a && b) { ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.lineWidth = 1.5; ctx.strokeStyle = 'rgba(255,214,170,.14)'; ctx.stroke(); }
+        }
+      }
+      ctx.restore();
+    }
+    return { toCam, project };
+  }
+
   function applyCamera(c) {
     const W = stage.clientWidth, H = stage.clientHeight;
-    const P = W / 2 / Math.tan((FOV * RAD) / 2);
-    const t = `translateZ(${P}px) rotateX(${c.pitch}rad) rotateY(${c.yaw}rad) translate3d(${-c.x * PX}px, ${c.y * PX}px, ${-c.z * PX}px)`;
-    cams.forEach((k) => { k.style.transform = t; });
-    // Project the screen's corners exactly as CSS does (translate, rotateY, rotateX, translateZ, perspective)
-    const cy = Math.cos(c.yaw), sy = Math.sin(c.yaw), cp = Math.cos(c.pitch), sp = Math.sin(c.pitch);
-    const proj = (X, Y) => {
-      let x = (X - c.x) * PX, y = (c.y - Y) * PX, z = (0 - c.z) * PX;
-      [x, z] = [x * cy + z * sy, -x * sy + z * cy];
-      [y, z] = [y * cp - z * sp, y * sp + z * cp];
-      z += P;
-      const f = P / (P - z);
-      return [W / 2 + x * f, H / 2 + y * f];
-    };
-    const hw = SCREEN_W / 2, top = c.cy + SCREEN_H / 2, bot = c.cy - SCREEN_H / 2;
-    const q = [proj(-hw, top), proj(hw, top), proj(hw, bot), proj(-hw, bot)];
+    if (!W || !H) return;
+    drawLayer(backC, scene.env, c, W, H);
+    const { toCam, project } = drawLayer(frontC, scene.rows, c, W, H);
+    // Place the flat trailer layer exactly over the projected screen
+    const hw = SCREEN_W / 2, top = scene.cy + SCREEN_H / 2, bot = scene.cy - SCREEN_H / 2;
+    const q = [[-hw, top, 0], [hw, top, 0], [hw, bot, 0], [-hw, bot, 0]].map((p) => project(toCam(p)));
     const xs = q.map((v) => v[0]), ys = q.map((v) => v[1]);
     const l = Math.min(...xs), t0 = Math.min(...ys), w = Math.max(...xs) - l, h = Math.max(...ys) - t0;
     Object.assign(flat.style, { left: l + 'px', top: t0 + 'px', width: w + 'px', height: h + 'px' });
-    flat.style.clipPath = `polygon(${q.map(([x, y]) => `${(x - l).toFixed(1)}px ${(y - t0).toFixed(1)}px`).join(',')})`;
+    flat.style.clipPath = flat.style.webkitClipPath = `polygon(${q.map(([x, y]) => `${(x - l).toFixed(1)}px ${(y - t0).toFixed(1)}px`).join(',')})`;
     sizeVideos();
   }
   function moveCamera(target, instant) {
