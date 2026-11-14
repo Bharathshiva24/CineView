@@ -55,7 +55,7 @@
   // ---------- 3D stage ----------
   const stage = document.querySelector('.demo-stage');
   if (!stage) return;
-  const cam = stage.querySelector('.cam'), env = stage.querySelector('.env'), rowsG = stage.querySelector('.rows'), scr = stage.querySelector('.screen');
+  const cams = [...stage.querySelectorAll('.cam')], flat = stage.querySelector('.flat-screen .vid'), env = stage.querySelector('.env'), rowsG = stage.querySelector('.rows'), scr = stage.querySelector('.screen');
   const el = (cls) => { const d = document.createElement('div'); d.className = 'p ' + cls; return d; };
   function place(node, w, h, x, y, z, extra = '') {
     node.style.width = w * PX + 'px'; node.style.height = h * PX + 'px';
@@ -75,8 +75,7 @@
     const dz2 = -dx * Math.sin(yaw) + dz * Math.cos(yaw);
     const pitch = Math.atan2(-dy, -dz2);
     stage.style.perspective = P + 'px';
-    cam.classList.toggle('instant', !!instant);
-    cam.style.transform = `translateZ(${P}px) rotateX(${pitch}rad) rotateY(${yaw}rad) translate3d(${-m.x * PX}px, ${m.y * PX}px, ${-m.z * PX}px)`;
+    moveCamera({ x: m.x, y: m.y, z: m.z, yaw, pitch, cy: m.cy }, instant);
 
     place(scr, SCREEN_W, SCREEN_H, 0, m.cy, 0);
     const H = Math.max(SCREEN_BOTTOM + SCREEN_H + 2.4, 7.5);
@@ -104,6 +103,47 @@
     }
     sizeVideos();
     renderPanel(m);
+  }
+
+  // ---------- Camera ----------
+  // Both 3D layers share one camera; the flat trailer layer is placed where the screen projects.
+  let camNow = null, camAnim = 0;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function applyCamera(c) {
+    const W = stage.clientWidth, H = stage.clientHeight;
+    const P = W / 2 / Math.tan((FOV * RAD) / 2);
+    const t = `translateZ(${P}px) rotateX(${c.pitch}rad) rotateY(${c.yaw}rad) translate3d(${-c.x * PX}px, ${c.y * PX}px, ${-c.z * PX}px)`;
+    cams.forEach((k) => { k.style.transform = t; });
+    // Project the screen's corners exactly as CSS does (translate, rotateY, rotateX, translateZ, perspective)
+    const cy = Math.cos(c.yaw), sy = Math.sin(c.yaw), cp = Math.cos(c.pitch), sp = Math.sin(c.pitch);
+    const proj = (X, Y) => {
+      let x = (X - c.x) * PX, y = (c.y - Y) * PX, z = (0 - c.z) * PX;
+      [x, z] = [x * cy + z * sy, -x * sy + z * cy];
+      [y, z] = [y * cp - z * sp, y * sp + z * cp];
+      z += P;
+      const f = P / (P - z);
+      return [W / 2 + x * f, H / 2 + y * f];
+    };
+    const hw = SCREEN_W / 2, top = c.cy + SCREEN_H / 2, bot = c.cy - SCREEN_H / 2;
+    const q = [proj(-hw, top), proj(hw, top), proj(hw, bot), proj(-hw, bot)];
+    const xs = q.map((v) => v[0]), ys = q.map((v) => v[1]);
+    const l = Math.min(...xs), t0 = Math.min(...ys), w = Math.max(...xs) - l, h = Math.max(...ys) - t0;
+    Object.assign(flat.style, { left: l + 'px', top: t0 + 'px', width: w + 'px', height: h + 'px' });
+    flat.style.clipPath = `polygon(${q.map(([x, y]) => `${(x - l).toFixed(1)}px ${(y - t0).toFixed(1)}px`).join(',')})`;
+    sizeVideos();
+  }
+  function moveCamera(target, instant) {
+    cancelAnimationFrame(camAnim);
+    if (instant || reduceMotion || !camNow) { camNow = target; applyCamera(camNow); return; }
+    const from = { ...camNow }, t0 = performance.now(), D = 1000;
+    const step = (now) => {
+      const k = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - k, 3);
+      camNow = {};
+      for (const key in target) camNow[key] = from[key] + (target[key] - from[key]) * e;
+      applyCamera(camNow);
+      if (k < 1) camAnim = requestAnimationFrame(step);
+    };
+    camAnim = requestAnimationFrame(step);
   }
 
   // ---------- Panel ----------
