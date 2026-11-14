@@ -1,5 +1,8 @@
 {
-  "cleanUrls": true,
+  "cleanUrls": false,
+  "rewrites": [
+    { "source": "/privacy", "destination": "/privacy.html" }
+  ],
   "headers": [
     { "source": "/downloads/(.*)", "headers": [ { "key": "Content-Disposition", "value": "attachment" } ] }
   ]
