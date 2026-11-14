@@ -10,6 +10,7 @@ Every version is archived as a ready-to-load zip in [`releases/`](releases/) and
 - BookMyShow's newer seat layout (drawn on a canvas with Konva) is now read directly: real rows, seat numbers, booked seats, section breaks and your selected seats, instead of falling back to a typical hall. A small page script (`content/konva-bridge.js`) reads the seat objects and never changes the page. Needs Chrome 111 or later.
 - Trailer search ignores a language suffix in the title ("Jailer 2 - Tamil", "Coolie (Telugu)") and uses it as the language hint instead, so these films find their trailer.
 - Notices now appear below the top pills instead of under the format pill.
+- Opening CineView from the toolbar on a page that was already open before install now also loads the canvas seat-map reader.
 
 ## Website update — mobile fixes (2026-11-14)
 - Hero live demo now shows on iPhone Safari: the stage is sized in pixels instead of relying on `aspect-ratio`.

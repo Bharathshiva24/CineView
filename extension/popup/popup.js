@@ -15,6 +15,8 @@ function showHelp(text) {
     window.close();
   } catch (_) {
     try {
+      // Page was open before CineView was installed: add the canvas seat-map reader (page context) too
+      await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['content/konva-bridge.js'], world: 'MAIN' }).catch(() => {});
       await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: FILES });
       await chrome.tabs.sendMessage(tab.id, { type: 'cineview:toggle' });
       window.close();
