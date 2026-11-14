@@ -3,6 +3,10 @@
 All notable changes to CineView. Versions follow [Semantic Versioning](https://semver.org): **MAJOR.MINOR.PATCH**.
 Every version is archived as a ready-to-load zip in [`releases/`](releases/) and tagged in git (`vX.Y.Z`).
 
+## Website update — mobile fixes (2026-11-14)
+- Hero live demo now shows on iPhone Safari: the stage is sized in pixels instead of relying on `aspect-ratio`.
+- Screen-format demo now resizes the trailer screen for each format (Scope, IMAX, Widescreen, 16:9) on mobile; all formats share one base width so IMAX reads taller, not just bigger.
+
 ## v2.4.2 — 2026-11-14
 - Fixed seat numbers in rows where every seat is booked. The extension showed "Seat –" there; it now takes the number from the seat in the same column of another row, and reads the numbering direction (16→1 or 1→16) from rows that show at least two numbers. Seen on District halls that are nearly sold out.
 - Promo video for LinkedIn (54 s, 1440 × 1080), made with HyperFrames.

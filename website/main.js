@@ -26,16 +26,32 @@
   window.addEventListener('resize', update);
   update();
 
-  // Format demo: the screen keeps its width and takes each format's real proportions
+  // Format demo: size the screen in pixels from the stage size and the format's real proportions.
+  // (Explicit sizes instead of CSS aspect-ratio, which iOS Safari can ignore here.)
   const screen = document.querySelector('.format-screen');
+  const fstage = document.querySelector('.format-stage');
   const buttons = [...document.querySelectorAll('.format-picker button')];
-  const select = (btn) => {
-    buttons.forEach((b) => b.setAttribute('aria-checked', String(b === btn)));
-    const ratio = parseFloat(btn.dataset.ratio);
-    const scale = parseFloat(btn.dataset.scale || '1');
-    screen.style.aspectRatio = String(ratio);
-    screen.style.width = `min(100%, ${Math.round(760 * scale)}px)`;
+  let current = buttons[0];
+  const fit = () => {
+    if (!screen || !fstage || !current) return;
+    const cs = getComputedStyle(fstage);
+    const availW = fstage.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    const availH = fstage.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    const ratio = parseFloat(current.dataset.ratio);
+    const scale = parseFloat(current.dataset.scale || '1');
+    // One base width for every format, chosen so the largest (IMAX) still fits: sizes stay comparable
+    const fits = buttons.map((b) => { const sc = parseFloat(b.dataset.scale || '1'), r = parseFloat(b.dataset.ratio); return Math.min(availW / sc, (availH * r) / sc); });
+    const base = Math.min(760, ...fits);
+    const w = base * scale, h = w / ratio;
+    screen.style.width = Math.round(w) + 'px';
+    screen.style.height = Math.round(h) + 'px';
   };
+  const select = (btn) => {
+    current = btn;
+    buttons.forEach((b) => b.setAttribute('aria-checked', String(b === btn)));
+    fit();
+  };
+  if (fstage) new ResizeObserver(fit).observe(fstage);
   buttons.forEach((b, i) => {
     b.addEventListener('click', () => select(b));
     b.addEventListener('keydown', (e) => {

@@ -246,8 +246,16 @@
   // Keep the formats trailer sized while the screen animates between ratios
   const fs = document.querySelector('.format-screen');
   if (fs) { new ResizeObserver(sizeVideos).observe(fs); fs.addEventListener('transitionend', sizeVideos); }
+  // Give the stage an explicit height on stacked layouts (iOS Safari can collapse it to zero otherwise)
+  function sizeStage() {
+    const vw = window.innerWidth;
+    if (vw <= 980) stage.style.height = Math.round(stage.clientWidth * (vw <= 760 ? 0.82 : 0.56)) + 'px';
+    else stage.style.height = '';
+  }
+  sizeStage();
+  window.addEventListener('resize', sizeStage);
   let lastW = 0;
-  new ResizeObserver(() => { const w = stage.clientWidth; if (Math.abs(w - lastW) > 1) { lastW = w; render(true); } }).observe(stage);
+  new ResizeObserver(() => { const w = stage.clientWidth; if (Math.abs(w - lastW) > 1) { lastW = w; sizeStage(); render(true); } }).observe(stage);
 
   setMovie(movie);
   render(true);
