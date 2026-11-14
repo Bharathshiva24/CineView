@@ -4,6 +4,9 @@ All notable changes to CineView. Versions follow [Semantic Versioning](https://s
 Every version is archived as a ready-to-load zip in [`releases/`](releases/) and tagged in git (`vX.Y.Z`).
 
 ## Website update (2026-11-14)
+- New link-preview (Open Graph) image: "See the screen from your seat." beside a Tears of Steel frame (© Blender Foundation, CC BY 3.0), with the film credit on the image and in the footer. Image version bumped to ?v=6 so social sites fetch the new one.
+
+## Website update (2026-11-14)
 - "Buy me a coffee" is now the secondary button beside Download in the hero (replacing "View source on GitHub", which stays in the footer) and under Download in the install section, styled quietly so Download stays the main action.
 - Install section now reads: "We're currently under review and will be available on the Chrome Web Store soon. Stay tuned!"
 
