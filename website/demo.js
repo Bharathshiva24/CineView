@@ -1,11 +1,30 @@
 // CineView website: live seat demo (hero) + trailer in the screen-format section
 (() => {
-  // Official trailers, played through YouTube's embedded player from the studios' own channels
+  // Official trailers from the studios' own YouTube channels (all checked as embeddable).
+  // Each page load picks one at random for each screen, never the one shown last time.
   const MOVIES = [
-    { id: 'f1', title: 'F1 The Movie', sub: 'Warner Bros.', video: '8yh9BPUBbbQ', label: 'F1 The Movie · Main trailer' },
-    { id: 'spidey', title: 'Spider-Man', sub: 'Sony Pictures', video: 'P3uI5sLosKU', label: 'Spider-Man: Brand New Day · Final trailer' }
+    { video: 'irVNGjRFZGk', label: 'Avengers: Doomsday · Official trailer' },
+    { video: 'uJqaGLmZpGo', label: 'Dune: Part Three · Final trailer' },
+    { video: 'f_bKjZeJBBI', label: 'The Odyssey · Official trailer' },
+    { video: 'QftAW9TTmuQ', label: 'Toy Story 5 · Final trailer' },
+    { video: 's1-pfiVMKAs', label: 'Supergirl · Official trailer' },
+    { video: 'IHWlvwu8t1w', label: 'The Mandalorian and Grogu · Official trailer' },
+    { video: 'P0XN3-n-2Lo', label: 'Project Hail Mary · Final trailer' },
+    { video: 'Ma1x7ikpid8', label: 'Avatar: Fire and Ash · Trailer' },
+    { video: 'En5QZmL5R1s', label: 'The Super Mario Galaxy Movie · Final trailer' },
+    { video: 'P3uI5sLosKU', label: 'Spider-Man: Brand New Day · Final trailer' },
+    { video: '8yh9BPUBbbQ', label: 'F1 The Movie · Official trailer' }
   ];
-  let movie = MOVIES[0];
+  const store = { get(k) { try { return localStorage.getItem(k); } catch (_) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (_) {} } };
+  function pickTrailer(avoid = []) {
+    const pool = MOVIES.filter((m) => !avoid.includes(m.video));
+    return (pool.length ? pool : MOVIES)[Math.floor(Math.random() * (pool.length || MOVIES.length))];
+  }
+  const lastShown = (store.get('cv:lastTrailers') || '').split(',').filter(Boolean);
+  const assigned = {};
+  assigned.hero = pickTrailer(lastShown);
+  assigned.formats = pickTrailer([...lastShown, assigned.hero.video]);
+  store.set('cv:lastTrailers', [assigned.hero.video, assigned.formats.video].join(','));
 
   // ---------- Hall model (metres) ----------
   const ROWS = 'ABCDEFGHIJ'.split('');          // A is nearest the screen
@@ -235,14 +254,7 @@
   }
 
   // ---------- Panel ----------
-  const seg = document.querySelector('.movie-seg'), map = document.querySelector('.seatmap'), stats = document.querySelector('.stats');
-  MOVIES.forEach((mv) => {
-    const b = document.createElement('button');
-    b.type = 'button'; b.setAttribute('role', 'radio'); b.dataset.id = mv.id;
-    b.innerHTML = `<b>${mv.title}</b><span>${mv.sub}</span>`;
-    b.addEventListener('click', () => setMovie(mv));
-    seg.appendChild(b);
-  });
+  const map = document.querySelector('.seatmap'), stats = document.querySelector('.stats');
 
   const screenBar = document.createElement('div'); screenBar.className = 'map-screen'; screenBar.innerHTML = '<span>Screen</span>';
   map.appendChild(screenBar);
@@ -302,36 +314,85 @@
   }
 
   // ---------- YouTube players ----------
+  // A clean projector look: YouTube's controls are off, the iframe takes no clicks, the edges where YouTube draws its
+  // title bar and logo are cropped, and a black cover hides the player until the trailer is actually playing
+  // (so buttons, the title bar and "more videos" thumbnails never show). When a trailer ends, another one starts.
   const players = {};
   let muted = true;
   const ORIGIN = location.origin;
+  const CROP = 1.2;            // extra zoom so YouTube's top title bar and bottom-right logo fall outside the screen
   function src(id) {
-    const p = new URLSearchParams({ autoplay: '1', mute: '1', controls: '0', rel: '0', playsinline: '1', loop: '1', playlist: id,
-      modestbranding: '1', iv_load_policy: '3', disablekb: '1', enablejsapi: '1', origin: ORIGIN });
+    const p = new URLSearchParams({ autoplay: '1', mute: '1', controls: '0', rel: '0', playsinline: '1', fs: '0',
+      modestbranding: '1', iv_load_policy: '3', disablekb: '1', cc_load_policy: '0', enablejsapi: '1', origin: ORIGIN });
     return `https://www.youtube-nocookie.com/embed/${id}?${p}`;
+  }
+  function labelFor(key, mv) {
+    if (key === 'hero') stage.querySelector('.movie-pill').textContent = mv.label;
+    else document.querySelectorAll('.format-now').forEach((p) => { p.textContent = `Now showing: ${mv.label}`; });
+  }
+  function load(key, mv) {
+    const pl = players[key];
+    pl.movie = mv; pl.state = -1; pl.everPlayed = false;
+    pl.box.classList.remove('live'); clearTimeout(pl.reveal);
+    pl.f.title = `${mv.label} (muted autoplay)`;
+    pl.f.src = src(mv.video);
+    labelFor(key, mv);
   }
   function mount(key) {
     const box = document.querySelector(`.vid[data-video="${key}"]`);
-    if (!box) return;
-    if (!players[key]) {
-      const f = document.createElement('iframe');
-      f.title = `${movie.label} (muted autoplay)`;
-      f.allow = 'autoplay; encrypted-media; picture-in-picture';
-      f.referrerPolicy = 'strict-origin-when-cross-origin';
-      f.setAttribute('tabindex', '-1');
-      f.src = src(movie.video);
-      f.addEventListener('load', () => { post(f, 'listening'); if (key === 'hero' && !muted) cmd(f, 'unMute'); });
-      box.appendChild(f);
-      players[key] = { f, video: movie.video, box };
-    } else if (players[key].video !== movie.video) {
-      players[key].f.src = src(movie.video); players[key].video = movie.video; players[key].f.title = `${movie.label} (muted autoplay)`;
-    }
+    if (!box || players[key]) return;
+    const f = document.createElement('iframe');
+    f.allow = 'autoplay; encrypted-media';
+    f.referrerPolicy = 'strict-origin-when-cross-origin';
+    f.setAttribute('tabindex', '-1');
+    f.setAttribute('aria-hidden', 'true');
+    const cover = document.createElement('div'); cover.className = 'vid-cover';
+    box.append(f, cover);
+    players[key] = { key, f, box, visible: true };
+    f.addEventListener('load', () => {
+      // Ask the player to report its state; it keeps sending updates after this
+      let n = 0; const t = setInterval(() => { post(f, 'listening'); if (++n > 8 || players[key].state !== -1) clearInterval(t); }, 250);
+      if (key === 'hero' && !muted) cmd(f, 'unMute');
+    });
+    load(key, assigned[key]);
     sizeVideos();
   }
   const post = (f, event) => { try { f.contentWindow.postMessage(JSON.stringify({ event, id: 'cv' }), '*'); } catch (_) {} };
   const cmd = (f, func, args = []) => { try { f.contentWindow.postMessage(JSON.stringify({ event: 'command', func, args }), '*'); } catch (_) {} };
 
-  // Fill each screen like a projector: 16:9 video covers the screen (scope trailers' black bars fall outside a 2.39 screen)
+  // YouTube player states: -1 unstarted, 0 ended, 1 playing, 2 paused, 3 buffering, 5 cued
+  function onState(pl, st) {
+    if (st === pl.state) return;
+    pl.state = st;
+    clearTimeout(pl.reveal);
+    if (st === 1) {
+      // The title bar fades out a few seconds after a trailer first starts; reveal after that, quickly on resume
+      pl.reveal = setTimeout(() => pl.box.classList.add('live'), pl.everPlayed ? 350 : 2600);
+      pl.everPlayed = true;
+    } else {
+      pl.box.classList.remove('live');
+      if (st === 0) {
+        const other = Object.values(players).filter((o) => o !== pl).map((o) => o.movie && o.movie.video);
+        load(pl.key, pickTrailer([pl.movie.video, ...other]));
+      } else if ((st === 2 || st === 5) && pl.visible) cmd(pl.f, 'playVideo');   // never sit paused on screen
+    }
+  }
+  window.addEventListener('message', (e) => {
+    let host = ''; try { host = new URL(e.origin).hostname; } catch (_) { return; }
+    if (!/youtube(-nocookie)?\.com$/.test(host)) return;
+    const pl = Object.values(players).find((p) => p.f.contentWindow === e.source);
+    if (!pl) return;
+    let d; try { d = typeof e.data === 'string' ? JSON.parse(e.data) : e.data; } catch (_) { return; }
+    if (!d) return;
+    if (d.event === 'onStateChange' && typeof d.info === 'number') onState(pl, d.info);
+    else if (d.event === 'infoDelivery' && d.info && typeof d.info.playerState === 'number') onState(pl, d.info.playerState);
+  });
+
+  // If the browser blocked autoplay (low-power mode, strict settings), start on the visitor's first interaction
+  const kick = () => Object.values(players).forEach((pl) => { if (pl.visible && pl.state !== 1) cmd(pl.f, 'playVideo'); });
+  ['pointerdown', 'keydown', 'touchstart'].forEach((ev) => window.addEventListener(ev, kick, { passive: true }));
+
+  // Fill each screen like a projector: the 16:9 video covers the screen, plus a little extra zoom to crop YouTube's overlays
   function sizeVideos() {
     Object.values(players).forEach(({ f, box }) => {
       const w = box.clientWidth, h = box.clientHeight;
@@ -339,7 +400,7 @@
       const r = 16 / 9;
       let vw, vh;
       if (w / h > r) { vw = w; vh = w / r; } else { vh = h; vw = h * r; }
-      f.style.width = vw + 'px'; f.style.height = vh + 'px';
+      f.style.width = vw * CROP + 'px'; f.style.height = vh * CROP + 'px';
     });
   }
 
@@ -352,21 +413,12 @@
     soundBtn.setAttribute('aria-pressed', String(!muted));
   });
 
-  function setMovie(mv) {
-    movie = mv;
-    seg.querySelectorAll('button').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.id === mv.id)));
-    stage.querySelector('.movie-pill').textContent = mv.label;
-    document.querySelectorAll('.format-now').forEach((p) => { p.textContent = `Now showing: ${mv.label}`; });
-    Object.keys(players).forEach(mount);
-    if (!players.hero) mount('hero');
-  }
-
   // Play only while visible (saves battery and bandwidth); the formats trailer loads when you scroll to it
   const io = new IntersectionObserver((entries) => {
     entries.forEach((e) => {
       const key = e.target.dataset.video;
-      if (e.isIntersecting) { if (!players[key]) mount(key); else cmd(players[key].f, 'playVideo'); }
-      else if (players[key]) cmd(players[key].f, 'pauseVideo');
+      if (e.isIntersecting) { if (!players[key]) mount(key); else { players[key].visible = true; cmd(players[key].f, 'playVideo'); } }
+      else if (players[key]) { players[key].visible = false; cmd(players[key].f, 'pauseVideo'); }
     });
   }, { rootMargin: '200px 0px' });
   document.querySelectorAll('.vid[data-video]').forEach((v) => io.observe(v));
@@ -385,6 +437,8 @@
   let lastW = 0;
   new ResizeObserver(() => { const w = stage.clientWidth; if (Math.abs(w - lastW) > 1) { lastW = w; sizeStage(); render(true); } }).observe(stage);
 
-  setMovie(movie);
+  labelFor('hero', assigned.hero);
+  labelFor('formats', assigned.formats);
+  if (!players.hero) mount('hero');
   render(true);
 })();

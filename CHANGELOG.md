@@ -3,6 +3,15 @@
 All notable changes to CineView. Versions follow [Semantic Versioning](https://semver.org): **MAJOR.MINOR.PATCH**.
 Every version is archived as a ready-to-load zip in [`releases/`](releases/) and tagged in git (`vX.Y.Z`).
 
+## v2.4.4 (2026-11-14)
+- Added a "Buy me a coffee" link (https://buymeacoffee.com/bharathshiva) to the toolbar popup, the options page and the bottom of the preview's Theatre settings.
+- The Chrome Web Store is reviewing v2.4.3; this version goes to the store as an update once that's approved.
+
+## Website update (2026-11-14)
+- Live demo and screen-format trailers now play like a cinema screen: no YouTube buttons, title bar or suggested-video thumbnails. The screen stays dark until the trailer is actually playing, and YouTube's overlays are cropped off the edges.
+- Each page load picks a random official trailer for each screen from 11 studio trailers, never repeating the last visit's; when one ends, another starts. The F1 / Spider-Man picker is gone.
+- Added "Buy me a coffee" links in the install section and the footer.
+
 ## Website update (2026-11-14)
 - Added a privacy policy page at /privacy (linked from the footer) for the Chrome Web Store listing.
 

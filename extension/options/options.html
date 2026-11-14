@@ -20,6 +20,7 @@ button { border: 0; background: none; color: #0a84ff; font: inherit; cursor: poi
 button.danger { color: var(--red); }
 #saved { color: #30d158; font-size: 13px; opacity: 0; transition: opacity .3s; } #saved.on { opacity: 1; }
 a { color: #0a84ff; text-decoration: none; }
+.coffee { white-space: nowrap; font-weight: 600; }
 </style></head>
 <body><main>
   <div class="hero"><img class="wm" src="../icons/wordmark-transparent.png" alt="CineView"><p>See the screen from your seat.</p></div>
@@ -33,4 +34,6 @@ a { color: #0a84ff; text-decoration: none; }
   <h2>Theatre</h2>
   <div class="card"><div class="row actions"><span>Reset theatre settings and trailer cache</span><button class="danger" id="reset">Reset</button></div></div>
   <p class="note">Screen size, row spacing and stadium height are adjusted in the preview and remembered automatically.</p>
+  <h2>Support</h2>
+  <div class="card"><div class="row actions"><span>CineView is free. If it helped you pick a better seat, consider supporting it.</span><a class="coffee" href="https://buymeacoffee.com/bharathshiva" target="_blank" rel="noopener">☕ Buy me a coffee</a></div></div>
 </main><script src="options.js"></script></body></html>

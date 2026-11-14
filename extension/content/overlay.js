@@ -228,6 +228,7 @@
   .set .seg { margin-top: 2px; }
   .link { border: 0; background: transparent; color: #ff453a; font: inherit; cursor: pointer; padding: 12px 14px; text-align: left; width: 100%; }
   .foot { color: rgba(235,235,245,.38); font-size: 11.5px; line-height: 1.45; }
+  .foot .coffee { color: rgba(235,235,245,.78); font-weight: 600; text-decoration: none; } .foot .coffee:hover { color: #fff; text-decoration: underline; }
   kbd { font: inherit; padding: 0 4px; border-radius: 4px; background: rgba(118,118,128,.24); }
   @media (max-width: 980px) { .shell { flex-direction: column; } aside { width: auto; max-height: 46vh; } }
   `;
@@ -299,7 +300,7 @@
               <div class="scroll">
                 <div class="list setlist"></div>
                 <p class="foot">CineView estimates the hall from the seat map. Adjust these if you know the theatre – recliner halls usually have about 1.6 m between rows.<br><br>
-                  Click any seat on the map to compare; pinch or <kbd>+</kbd> <kbd>−</kbd> to zoom, drag to pan. <kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd> move · <kbd>Space</kbd> play · <kbd>M</kbd> sound · <kbd>Esc</kbd> close.</p>
+                  Click any seat on the map to compare; pinch or <kbd>+</kbd> <kbd>−</kbd> to zoom, drag to pan. <kbd>←</kbd><kbd>→</kbd><kbd>↑</kbd><kbd>↓</kbd> move · <kbd>Space</kbd> play · <kbd>M</kbd> sound · <kbd>Esc</kbd> close.<br><br>CineView is free. If it helped, <a class="coffee" href="https://buymeacoffee.com/bharathshiva" target="_blank" rel="noopener">buy me a coffee ☕</a></p>
               </div>
             </div>
           </div>
