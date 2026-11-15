@@ -184,9 +184,23 @@
     });
   }
 
+  // The seat's own accessible label wins over class names inside it (District puts an "unavailableIcon" element
+  // inside every seat, including available ones).
+  function ownSeatState(el) {
+    for (const n of [el, ...el.querySelectorAll('[aria-label]')].slice(0, 4)) {
+      const v = (n.getAttribute && n.getAttribute('aria-label')) || '';
+      if (/^\s*(selected|chosen)\b/i.test(v)) return 'selected';
+      if (/^\s*(unavailable|sold|booked|occupied|blocked|reserved|not available)\b/i.test(v)) return 'occupied';
+      if (/^\s*available\b/i.test(v)) return 'available';
+    }
+    return '';
+  }
+
   function classify(seats) {
     // Base statuses from semantics
     for (const s of seats) {
+      const own = ownSeatState(s.el);
+      if (own) { s.status = own === 'available' && ariaSelected(s.el) ? 'selected' : own; s.fill = seatFill(s.el); s.trusted = true; continue; }
       const meta = classAndAria(s.el);
       const hasSvg = !!s.el.querySelector('svg');
       if (ariaSelected(s.el) || SELECTED_RE.test(meta)) s.status = 'selected';
@@ -203,7 +217,7 @@
     const commonKey = [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0];
 
     for (const s of seats) {
-      if (s.status !== 'available' || !s.fill) continue;
+      if (s.status !== 'available' || !s.fill || s.trusted) continue;
       const k = fillKey(s.fill);
       if (k === commonKey) continue;
       const { s: sat, l } = hsl(s.fill);
@@ -213,7 +227,7 @@
 
     // Seats the user clicked this session that still look non-default
     for (const s of seats) {
-      if (s.status === 'available' && [...CV.clickedSeatEls].some((c) => c === s.el || s.el.contains(c) || c.contains(s.el))) {
+      if (s.status === 'available' && !s.trusted && [...CV.clickedSeatEls].some((c) => c === s.el || s.el.contains(c) || c.contains(s.el))) {
         if (fillKey(s.fill) !== commonKey) s.status = 'selected';
       }
     }
@@ -237,6 +251,34 @@
       h: c.r.height
     }));
     seats = classify(seats);
+    if (seats.length < 12) return null;
+    return buildLayout(seats);
+  };
+
+  // Seats that describe themselves, e.g. District: aria-label="available seat, class BALCONY, row G, column 14, price 150"
+  // (and "selected class BALCONY, row G, column 14 …" / "unavailable seat, …"). Row and state come straight from the label;
+  // the seat number is the one printed on the seat ("1A", "14"), since the label's column count can differ from it.
+  const ARIA_SEAT_RE = /\brow\s+([A-Z]{1,3})\b[\s\S]*?\b(?:column|col|seat(?:\s+no\.?|\s+number)?)\s+([A-Z]?\d{1,3}[A-Z]?)\b/i;
+  CV.detectAriaLayout = function () {
+    const seen = new Set();
+    const seats = [];
+    for (const el of document.querySelectorAll('[aria-label]')) {
+      if (el.closest('#cineview-root')) continue;
+      const aria = el.getAttribute('aria-label') || '';
+      const m = aria.match(ARIA_SEAT_RE);
+      if (!m) continue;
+      if ([...seen].some((o) => o.contains(el) || el.contains(o))) continue; // nested duplicates
+      const r = el.getBoundingClientRect();
+      if (r.width < 6 || r.height < 6 || r.width > 120 || r.height > 120) continue;
+      seen.add(el);
+      const printed = (el.textContent || '').trim();
+      const label = /^[A-Za-z]?\d{1,3}[A-Za-z]?$/.test(printed) ? printed : m[2];
+      const cls = typeof el.className === 'string' ? el.className : '';
+      let status = 'available';
+      if (/^\s*(selected|chosen)\b/i.test(aria) || ariaSelected(el) || /(^|[\s_-])(selected|seat-selected)([\s_-]|$)/i.test(cls)) status = 'selected';
+      else if (/^\s*(unavailable|sold|booked|occupied|blocked|reserved|not available)\b/i.test(aria) || ariaDisabled(el) || /(^|[\s_-])(sold|occupied|booked|blocked)([\s_-]|$)|__disable/i.test(cls)) status = 'occupied';
+      seats.push({ id: seats.length, el, text: label, label, rowLabel: m[1].toUpperCase(), cx: r.left + r.width / 2, cy: r.top + r.height / 2, w: r.width, h: r.height, status });
+    }
     if (seats.length < 12) return null;
     return buildLayout(seats);
   };

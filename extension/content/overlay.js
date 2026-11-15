@@ -1,4 +1,4 @@
-// CineView – in-page preview: a CSS-3D theatre seen from the chosen seat, with the trailer on screen
+// CineView – in-page preview: the theatre seen from the chosen seat (drawn on canvas), with the trailer on screen
 (function () {
   const CV = (window.CineView = window.CineView || {});
   const PX = 100; // CSS pixels per metre in the 3D world
@@ -29,7 +29,7 @@
   * { box-sizing: border-box; margin: 0; }
   svg { width: 100%; height: 100%; display: block; }
   .backdrop { position: fixed; inset: 0; z-index: 2147483646; display: flex; padding: 20px;
-    background: rgba(0,0,0,.62); -webkit-backdrop-filter: blur(24px) saturate(160%); backdrop-filter: blur(24px) saturate(160%);
+    background: rgba(8,8,10,.93); /* no full-page backdrop blur: re-blurring the page on every video frame made Chrome drop frames */
     font: 400 13px/1.38 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", "Inter", system-ui, sans-serif;
     -webkit-font-smoothing: antialiased; color: #f5f5f7; letter-spacing: -.003em;
     animation: fade .35s ${EASE}; }
@@ -42,15 +42,12 @@
   /* ---------- Stage ---------- */
   .stage { position: relative; flex: 1; min-width: 0; border-radius: 22px; overflow: hidden; background: #000;
     perspective-origin: 50% 50%; box-shadow: 0 0 0 .5px rgba(255,255,255,.1), 0 40px 100px rgba(0,0,0,.5); }
-  .camera, .group { position: absolute; inset: 0; transform-style: preserve-3d; transform-origin: 50% 50%; }
-  .camera { transition: transform 1.1s ${EASE}; }
-  .camera.instant { transition: none; }
-  .p { position: absolute; left: 50%; top: 50%; backface-visibility: visible; transform-origin: 50% 50%; }
-  .screen { background: #000; overflow: hidden; box-shadow: 0 0 160px 40px rgba(170,180,255,.10), 0 0 0 10px #020203;
-    transition: width .8s ${EASE}, height .8s ${EASE}, margin .8s ${EASE}, transform .8s ${EASE}; }
-  .camera.instant .screen, .camera.instant .screen iframe { transition: none; }
-  .screen iframe { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); border: 0; display: block; pointer-events: none;
-    transition: width .8s ${EASE}, height .8s ${EASE}; }
+  /* The hall is drawn on two canvases: walls + screen frame behind the trailer, seat rows in front of it.
+     (Hundreds of CSS-3D planes made Chrome drop frames and flicker in large halls.) */
+  .stage.moving .glass { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(28,28,30,.9); }
+  canvas.hall { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
+  .screen { position: absolute; left: 0; top: 0; width: 0; height: 0; background: #000; overflow: hidden; }
+  .screen iframe { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); border: 0; display: block; pointer-events: none; }
   .placeholder { container-type: size; position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
     justify-content: center; gap: 4cqh; background: radial-gradient(80% 90% at 50% 40%, #1d1d22, #050506); text-align: center; padding: 5%; }
   .placeholder h2 { font-size: min(9cqw, 26cqh); font-weight: 700; letter-spacing: -.03em; line-height: 1; color: #fff; }
@@ -64,19 +61,6 @@
     repeating-linear-gradient(0deg, rgba(255,255,255,.28) 0 2px, transparent 2px 20%), #141416; }
   .grid::after { content: ""; position: absolute; left: 50%; top: 50%; width: 38%; aspect-ratio: 1; transform: translate(-50%,-50%);
     border: 8px solid #fff; border-radius: 50%; }
-  .frontwall { background: radial-gradient(55% 50% at 50% 42%, #18181c 0%, #0a0a0c 75%); }
-  .drape { background: repeating-linear-gradient(90deg, #121214 0 46px, #1a1a1e 46px 78px, #0e0e10 78px 120px); }
-  .wall { background: linear-gradient(90deg, #0b0b0d, #121215 45%, #0a0a0c); }
-  .glow { background: radial-gradient(closest-side, rgba(255,214,170,.42), rgba(255,200,150,.06) 62%, transparent); border-radius: 50%; }
-  .ceiling { background: radial-gradient(60% 70% at 50% 0%, #0f0f12, #050506); }
-  .floor { background: #08080a; }
-  .tread { background: linear-gradient(#111114, #0a0a0c); }
-  .riser { background: #060607; box-shadow: inset 0 2px 0 rgba(255,214,170,.14); }
-  .seatback { background: linear-gradient(180deg, #2b2b31 0%, #212126 30%, #17171b 75%, #101012 100%);
-    border-radius: 34% 34% 10% 10% / 24% 24% 6% 6%;
-    box-shadow: inset 0 3px 0 rgba(255,255,255,.08), inset 3px 0 0 rgba(255,255,255,.025), inset -3px 0 0 rgba(0,0,0,.35); }
-  .seattop { background: linear-gradient(#2e2e34, #1d1d21); border-radius: 50%; }
-  .arm { background: linear-gradient(#202024, #0d0d0f); border-radius: 6px 6px 2px 2px; }
   .vignette { position: absolute; inset: 0; pointer-events: none;
     background: radial-gradient(125% 105% at 50% 45%, transparent 58%, rgba(0,0,0,.5)); }
 
@@ -249,11 +233,9 @@
     <div class="backdrop">
       <div class="shell">
         <div class="stage">
-          <div class="camera">
-            <div class="group env"></div>
-            <div class="group rows"></div>
-            <div class="p screen"></div>
-          </div>
+          <canvas class="hall back"></canvas>
+          <div class="screen"></div>
+          <canvas class="hall front"></canvas>
           <div class="vignette"></div>
           <div class="capsule glass"></div>
           <button class="fmtpill glass" title="Screen format"></button>
@@ -309,7 +291,7 @@
     </div>`;
     const q = (s) => root.querySelector(s);
     state.els = {
-      backdrop: q('.backdrop'), stage: q('.stage'), camera: q('.camera'), env: q('.env'), rows: q('.rows'), screen: q('.screen'),
+      backdrop: q('.backdrop'), stage: q('.stage'), back: q('canvas.back'), front: q('canvas.front'), screen: q('.screen'),
       capsule: q('.capsule'), toast: q('.toast'), menu: q('.menu'), play: q('.play'), mute: q('.mute'), trailerBtn: q('.trailer-btn'),
       next: q('.next'), yt: q('.yt'), close: q('.x'), close2: q('.x2'), gear: q('.gear'), backbtn: q('.backbtn'), aside: q('aside'), fmtpill: q('.fmtpill'), fmtmenu: q('.fmtmenu'), mapinner: q('.mapinner'), zin: q('.zin'), zout: q('.zout'), zfit: q('.zfit'), zoomlbl: q('.zoomlbl'), form: q('.movie form'), title: q('.title'), dot: q('.dot'), srctext: q('.srctext'),
       seats: q('.seats'), seatseg: q('.seatseg'), arc: q('.arc'), num: q('.num'), verdict: q('.verdict'), summary: q('.summary'),
@@ -351,16 +333,26 @@
     return host;
   }
 
-  // ---------- 3D placement ----------
-  function place(el, w, hgt, x, y, z, extra = '') {
-    el.style.width = w * PX + 'px';
-    el.style.height = hgt * PX + 'px';
-    el.style.marginLeft = (-w * PX) / 2 + 'px';
-    el.style.marginTop = (-hgt * PX) / 2 + 'px';
-    el.style.transform = `translate3d(${x * PX}px, ${-y * PX}px, ${z * PX}px) ${extra}`;
-    return el;
+  // ---------- 3D stage, drawn on canvas ----------
+  // World units are metres: x across the hall, y up, z from the screen towards the audience.
+  // A flat panel: orient '' faces the screen, 'x' lies flat (floor / ceiling / treads), 'y' is a side wall.
+  function panel(cls, w, hgt, x, y, z, orient = '', shape = 'rect') {
+    let local;
+    if (shape === 'seat') {
+      const rx = w * 0.34, ry = hgt * 0.24, bx = w * 0.1, by = hgt * 0.06, pts = [];
+      const arc = (cx, cy, ax, ay, a0, a1) => { for (let i = 0; i <= 4; i++) { const a = a0 + ((a1 - a0) * i) / 4; pts.push([cx + ax * Math.cos(a), cy + ay * Math.sin(a)]); } };
+      const hw = w / 2, hh = hgt / 2;
+      arc(-hw + rx, hh - ry, rx, ry, Math.PI, Math.PI / 2);
+      arc(hw - rx, hh - ry, rx, ry, Math.PI / 2, 0);
+      arc(hw - bx, -hh + by, bx, by, 0, -Math.PI / 2);
+      arc(-hw + bx, -hh + by, bx, by, -Math.PI / 2, -Math.PI);
+      local = pts;
+    } else if (shape === 'circle') {
+      local = Array.from({ length: 18 }, (_, i) => [(w / 2) * Math.cos((i / 18) * 2 * Math.PI), (hgt / 2) * Math.sin((i / 18) * 2 * Math.PI)]);
+    } else local = [[-w / 2, hgt / 2], [w / 2, hgt / 2], [w / 2, -hgt / 2], [-w / 2, -hgt / 2]];
+    const map = orient === 'x' ? ([u, v]) => [x + u, y, z + v] : orient === 'y' ? ([u, v]) => [x, y + v, z + u] : ([u, v]) => [x + u, y + v, z];
+    return { cls, pts: local.map(map), w, h: hgt, x, y, z };
   }
-  function plane(parent, cls, w, hgt, x, y, z, extra) { return parent.appendChild(place(h('div', 'p ' + cls), w, hgt, x, y, z, extra)); }
 
   function cameraTransform(view, stageW) {
     const s = state.settings;
@@ -373,7 +365,7 @@
     const yaw = Math.atan2(dx, -dz);
     const dz2 = -dx * Math.sin(yaw) + dz * Math.cos(yaw);
     const pitch = Math.atan2(-dy, -dz2);
-    return { P, yaw, pitch, css: `translateZ(${P}px) rotateX(${pitch}rad) rotateY(${yaw}rad) translate3d(${-cam.x * PX}px, ${cam.y * PX}px, ${-cam.z * PX}px)` };
+    return { P, yaw, pitch };
   }
 
   // ---------- Scene (theatre only – no people) ----------
@@ -383,9 +375,6 @@
     const view = CV.computeView(state.seat, layout, s);
     state.view = view;
     const camT = cameraTransform(view, E.stage.clientWidth || 1000);
-    E.stage.style.perspective = camT.P + 'px';
-    E.camera.classList.toggle('instant', !!instant);
-    E.camera.style.transform = camT.css;
 
     const { cam, screen, hall } = view;
     const halfFov = (s.fov / 2 + 12) * RAD;
@@ -395,32 +384,32 @@
     const xRangeAt = (d) => [cam.x + d * Math.tan(angLo), cam.x + d * Math.tan(angHi)];
     const maxDepress = 80 * RAD - pitchUp;
 
-    place(E.screen, screen.w, screen.h, 0, screen.centerY, 0);
-    sizeVideo();
-
-    const env = E.env; env.textContent = '';
+    const env = [];
     const H = Math.max(screen.bottom + screen.h + 2.5, 8);
     const backZ = cam.z;
-    plane(env, 'frontwall', hall + 2, H + 1, 0, H / 2, -0.15);
+    env.push(panel('frontwall', hall + 2, H + 1, 0, H / 2, -0.15));
     const side = (hall - screen.w) / 2 - 0.3;
-    if (side > 0.2) for (const sg of [-1, 1]) plane(env, 'drape', side, H, sg * (screen.w / 2 + 0.3 + side / 2), H / 2, -0.1);
-
+    if (side > 0.2) for (const sg of [-1, 1]) {
+      // drapes as vertical folds
+      const x0 = sg * (screen.w / 2 + 0.3), n = Math.max(2, Math.round(side / 0.4)), pw = side / n;
+      for (let i = 0; i < n; i++) env.push(panel(i % 3 === 1 ? 'drape2' : i % 3 === 2 ? 'drape3' : 'drape', pw + 0.01, H, x0 + sg * (pw * i + pw / 2), H / 2, -0.1));
+    }
+    const ceilAhead = Math.max(0.8, (H - cam.y) / Math.tan(80 * RAD + Math.min(0, camT.pitch)));
+    const ceilEnd = Math.max(0.5, backZ - ceilAhead);
+    env.push(panel('ceiling', hall, ceilEnd, 0, H, ceilEnd / 2, 'x'));
+    const frontFloorEnd = Math.min(CV.firstRow(layout, s) - s.rowPitch / 2, backZ - 0.8);
+    if (frontFloorEnd > 0.2) env.push(panel('floor', hall, frontFloorEnd, 0, 0, frontFloorEnd / 2, 'x'));
     for (const sg of [-1, 1]) {
       const xw = (sg * hall) / 2;
       const lateral = Math.abs(xw - cam.x);
       const budget = xw < cam.x ? -angLo : angHi;
       const minAhead = budget > 0.05 ? Math.max(0.6, lateral / Math.tan(Math.min(budget, 85 * RAD))) : lateral * 4;
       const zEnd = Math.max(0.5, backZ - minAhead);
-      plane(env, 'wall', zEnd, H, xw, H / 2, zEnd / 2, `rotateY(${sg * -90}deg)`);
-      for (let z = 3; z < zEnd - 0.5; z += 4.5) plane(env, 'glow', 1.6, 1.6, xw - sg * 0.02, 3.2, z, `rotateY(${sg * -90}deg)`);
+      env.push(panel('wall', zEnd, H, xw, H / 2, zEnd / 2, 'y'));
+      for (let z = 3; z < zEnd - 0.5; z += 4.5) env.push(panel('glow', 1.6, 1.6, xw - sg * 0.02, 3.2, z, 'y', 'circle'));
     }
-    const ceilAhead = Math.max(0.8, (H - cam.y) / Math.tan(80 * RAD + Math.min(0, camT.pitch)));
-    const ceilEnd = Math.max(0.5, backZ - ceilAhead);
-    plane(env, 'ceiling', hall, ceilEnd, 0, H, ceilEnd / 2, 'rotateX(90deg)');
-    const frontFloorEnd = Math.min(CV.firstRow(layout, s) - s.rowPitch / 2, backZ - 0.8);
-    if (frontFloorEnd > 0.2) plane(env, 'floor', hall, frontFloorEnd, 0, 0, frontFloorEnd / 2, 'rotateX(90deg)');
 
-    const rowsG = E.rows; rowsG.textContent = '';
+    const rows = [];
     for (let i = 0; i < state.seat.row; i++) {
       const row = layout.rows[i];
       const zr = CV.rowDistance(row, s, layout);
@@ -433,24 +422,147 @@
       const minY = cam.y - (ahead - 0.35) * Math.tan(maxDepress);
 
       const t0 = zr - s.rowPitch / 2, t1 = Math.min(zr + s.rowPitch / 2, cam.z - 0.4);
-      if (fl > minY && t1 > t0) plane(rowsG, 'tread', hi - lo, t1 - t0, (lo + hi) / 2, fl, (t0 + t1) / 2, 'rotateX(90deg)');
       if (s.riserPerRow > 0 && i > 0) {
         const rb = Math.max(fl - s.riserPerRow, minY);
-        if (fl > rb) plane(rowsG, 'riser', hi - lo, fl - rb, (lo + hi) / 2, (fl + rb) / 2, t0);
+        if (fl > rb) rows.push(panel('riser', hi - lo, fl - rb, (lo + hi) / 2, (fl + rb) / 2, t0));
       }
+      if (fl > minY && t1 > t0) rows.push(panel('tread', hi - lo, t1 - t0, (lo + hi) / 2, fl, (t0 + t1) / 2, 'x'));
       // every seat drawn on its own (seat back + armrest) so each one is distinguishable
       const top = fl + 0.98, bot = Math.max(fl + 0.3, minY);
       if (top <= bot) continue;
       const sw = s.seatWidth * 0.82;
       const zBack = zr + 0.32;
+      const xs = [];
       for (const seat of row.seats) {
         const sx = ((seat.cx - layout.centerX) / layout.seatPitchPx) * s.seatWidth;
         if (sx + s.seatWidth / 2 < lo || sx - s.seatWidth / 2 > hi) continue;
-        plane(rowsG, 'seatback', sw, top - bot, sx, (top + bot) / 2, zBack);
-        plane(rowsG, 'arm', 0.07, 0.28, sx + s.seatWidth / 2, Math.max(fl + 0.52, bot + 0.14), zBack - 0.22);
+        xs.push(sx);
+      }
+      xs.sort((a, b) => Math.abs(b - cam.x) - Math.abs(a - cam.x)); // outer seats first, the ones ahead of you last
+      for (const sx of xs) rows.push(panel('seatback', sw, top - bot, sx, (top + bot) / 2, zBack, '', 'seat'));
+      for (const sx of xs) rows.push(panel('arm', 0.07, 0.28, sx + s.seatWidth / 2, Math.max(fl + 0.52, bot + 0.14), zBack - 0.22));
+    }
+    state.scene = { env, rows };
+    moveCamera({ x: cam.x, y: cam.y, z: cam.z, yaw: camT.yaw, pitch: camT.pitch, sw: screen.w, sh: screen.h, scy: screen.centerY }, instant);
+    renderPanel(view);
+  }
+
+  // ---------- Camera ----------
+  const NEAR = 8; // px in front of the eye; geometry closer than this is clipped
+  function viewer(c, W) {
+    const P = W / 2 / Math.tan((state.settings.fov * RAD) / 2);
+    const cyw = Math.cos(c.yaw), syw = Math.sin(c.yaw), cp = Math.cos(c.pitch), sp = Math.sin(c.pitch);
+    // camera space (translate, rotateY, rotateX); depth z < 0 is in front of the eye
+    const toCam = ([X, Y, Z]) => {
+      let x = (X - c.x) * PX, y = (c.y - Y) * PX, z = (Z - c.z) * PX;
+      [x, z] = [x * cyw + z * syw, -x * syw + z * cyw];
+      [y, z] = [y * cp - z * sp, y * sp + z * cp];
+      return [x, y, z];
+    };
+    return { P, toCam };
+  }
+  function clipNear(poly) {
+    const out = [];
+    for (let i = 0; i < poly.length; i++) {
+      const a = poly[i], b = poly[(i + 1) % poly.length];
+      const ia = a[2] <= -NEAR, ib = b[2] <= -NEAR;
+      if (ia) out.push(a);
+      if (ia !== ib) { const t = (-NEAR - a[2]) / (b[2] - a[2]); out.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, -NEAR]); }
+    }
+    return out;
+  }
+
+  const FILL = { frontwall: '#0d0d10', drape: '#121214', drape2: '#1a1a1e', drape3: '#0e0e10', wall: '#0e0e11', ceiling: '#050506', floor: '#08080a', tread: '#0d0d10', riser: '#060607', arm: '#141417', screen: '#000' };
+  function drawLayer(canvas, list, c, W, H) {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    if (canvas.width !== Math.round(W * dpr) || canvas.height !== Math.round(H * dpr)) { canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr); }
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    const { P, toCam } = viewer(c, W);
+    const project = ([x, y, z]) => { const f = P / -z; return [W / 2 + x * f, H / 2 + y * f]; };
+    const projPt = (p) => { const q = toCam(p); return q[2] <= -NEAR ? project(q) : null; };
+    for (const it of list) {
+      const poly = clipNear(it.pts.map(toCam));
+      if (poly.length < 3) continue;
+      const pts = poly.map(project);
+      ctx.beginPath(); pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.closePath();
+      if (it.cls === 'seatback') {
+        const a = projPt([it.x, it.y + it.h / 2, it.z]), b = projPt([it.x, it.y - it.h / 2, it.z]);
+        if (a && b) {
+          const g = ctx.createLinearGradient(a[0], a[1], b[0], b[1]);
+          g.addColorStop(0, '#2b2b31'); g.addColorStop(0.3, '#212126'); g.addColorStop(0.75, '#17171b'); g.addColorStop(1, '#101012');
+          ctx.fillStyle = g;
+        } else ctx.fillStyle = '#1a1a1e';
+        ctx.fill();
+        if (a) { ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,255,255,.05)'; ctx.stroke(); }
+      } else if (it.cls === 'glow') {
+        const ctr = projPt([it.x, it.y, it.z]);
+        if (ctr) {
+          const r = Math.max(...pts.map(([x, y]) => Math.hypot(x - ctr[0], y - ctr[1])));
+          const g = ctx.createRadialGradient(ctr[0], ctr[1], 0, ctr[0], ctr[1], r);
+          g.addColorStop(0, 'rgba(255,214,170,.42)'); g.addColorStop(0.62, 'rgba(255,200,150,.06)'); g.addColorStop(1, 'rgba(255,200,150,0)');
+          ctx.fillStyle = g; ctx.fill();
+        }
+      } else if (it.cls === 'frontwall') {
+        const ctr = projPt([0, c.scy, -0.15]);
+        const xs = pts.map((p) => p[0]);
+        if (ctr) {
+          const g = ctx.createRadialGradient(ctr[0], ctr[1], 0, ctr[0], ctr[1], Math.max(1, (Math.max(...xs) - Math.min(...xs)) * 0.55));
+          g.addColorStop(0, '#18181c'); g.addColorStop(1, '#0a0a0c'); ctx.fillStyle = g;
+        } else ctx.fillStyle = FILL.frontwall;
+        ctx.fill();
+      } else if (it.cls === 'screen') {
+        ctx.save();
+        ctx.shadowColor = 'rgba(170,180,255,.22)'; ctx.shadowBlur = Math.min(120, W * 0.1);
+        ctx.fillStyle = '#000'; ctx.fill();
+        ctx.restore();
+        ctx.lineWidth = Math.max(2, W / 120); ctx.strokeStyle = '#020203'; ctx.stroke();
+      } else {
+        ctx.fillStyle = FILL[it.cls] || '#0a0a0c'; ctx.fill();
+        if (it.cls === 'riser') {
+          const a = projPt([it.x - it.w / 2, it.y + it.h / 2, it.z]), b = projPt([it.x + it.w / 2, it.y + it.h / 2, it.z]);
+          if (a && b) { ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.lineWidth = 1.5; ctx.strokeStyle = 'rgba(255,214,170,.14)'; ctx.stroke(); }
+        }
       }
     }
-    renderPanel(view);
+    return { toCam, project };
+  }
+
+  function applyCamera(c) {
+    const E = state.els;
+    const W = E.stage.clientWidth, H = E.stage.clientHeight;
+    if (!W || !H || !state.scene) return;
+    drawLayer(E.back, [...state.scene.env, panel('screen', c.sw, c.sh, 0, c.scy, 0)], c, W, H);
+    const { toCam, project } = drawLayer(E.front, state.scene.rows, c, W, H);
+    // The trailer sits in a flat layer between the two canvases, cut to the projected screen
+    const hw = c.sw / 2, top = c.scy + c.sh / 2, bot = c.scy - c.sh / 2;
+    const q = [[-hw, top, 0], [hw, top, 0], [hw, bot, 0], [-hw, bot, 0]].map((p) => project(toCam(p)));
+    const xs = q.map((v) => v[0]), ys = q.map((v) => v[1]);
+    const l = Math.min(...xs), t0 = Math.min(...ys), w = Math.max(...xs) - l, hh = Math.max(...ys) - t0;
+    Object.assign(E.screen.style, { left: l + 'px', top: t0 + 'px', width: w + 'px', height: hh + 'px' });
+    E.screen.style.clipPath = `polygon(${q.map(([x, y]) => `${(x - l).toFixed(1)}px ${(y - t0).toFixed(1)}px`).join(',')})`;
+    state.screenBox = { w, h: hh };
+    sizeVideo();
+  }
+
+  let camNow = null, camAnim = 0;
+  function moveCamera(target, instant) {
+    cancelAnimationFrame(camAnim);
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const stage = state.els.stage;
+    if (instant || reduce || !camNow) { stage.classList.remove('moving'); camNow = target; applyCamera(camNow); return; }
+    const from = { ...camNow }, t0 = performance.now(), D = 1000;
+    stage.classList.add('moving'); // re-blurring the glass controls every frame is what makes a move stutter
+    const step = (now) => {
+      if (!state.host) return;
+      const k = Math.min(1, (now - t0) / D), e = 1 - Math.pow(1 - k, 3);
+      camNow = {};
+      for (const key in target) camNow[key] = from[key] + (target[key] - from[key]) * e;
+      applyCamera(camNow);
+      if (k < 1) camAnim = requestAnimationFrame(step); else stage.classList.remove('moving');
+    };
+    camAnim = requestAnimationFrame(step);
   }
 
   // ---------- Sidebar ----------
@@ -644,13 +756,13 @@
   // Fill the screen with the trailer like a projector would ("cover"): scope trailers are letterboxed 16:9 files,
   // so cropping to a 2.39 screen shows exactly the picture. "Fit" shows the whole 16:9 frame instead.
   function sizeVideo() {
-    const f = state.iframe, v = state.view;
-    if (!f || !v) return;
-    const sw = v.screen.w * PX, sh = v.screen.h * PX, va = 16 / 9;
+    const f = state.iframe, b = state.screenBox;
+    if (!f || !b) return;
+    const sw = b.w, sh = b.h, va = 16 / 9;
     const cover = state.settings.videoFit !== 'fit';
     let w, hh;
     if ((sw / sh > va) === cover) { w = sw; hh = sw / va; } else { hh = sh; w = sh * va; }
-    f.style.width = w + 'px'; f.style.height = hh + 'px';
+    f.style.width = Math.ceil(w) + 'px'; f.style.height = Math.ceil(hh) + 'px';
   }
 
   const SETTING_DEFS = [
@@ -774,9 +886,12 @@
       autoplay: '1', mute: state.muted ? '1' : '0', controls: '0', rel: '0', playsinline: '1', modestbranding: '1',
       loop: '1', playlist: t.videoId, enablejsapi: '1', iv_load_policy: '3', disablekb: '1'
     });
-    if (/^https?:/.test(location.origin)) params.set('origin', location.origin);
+    // On a web page YouTube sees that page as the referrer. Extension pages (the bundled demo) send none, which YouTube
+    // rejects with error 153, so there the player loads through CineView's website.
+    const direct = /^https?:$/.test(location.protocol);
+    if (direct) params.set('origin', location.origin);
     const f = document.createElement('iframe');
-    f.src = `https://www.youtube-nocookie.com/embed/${t.videoId}?${params}`;
+    f.src = direct ? `https://www.youtube-nocookie.com/embed/${t.videoId}?${params}` : `https://cineview-ten.vercel.app/embed.html?v=${t.videoId}&${params}`;
     f.allow = 'autoplay; encrypted-media; picture-in-picture';
     f.referrerPolicy = 'strict-origin-when-cross-origin';
     f.title = t.title || 'Trailer';
@@ -832,6 +947,7 @@
         layout: ctx.layout, selected: ctx.selected || [], seat: ctx.seat, settings: { ...CV.DEFAULT_SETTINGS, ...(ctx.settings || {}) },
         trailers: [], trailerIdx: 0, muted: true, playing: true, iframe: null, hints: ctx.hints || null, formatInfo: ctx.formatInfo || null, formatManual: false
       });
+      cancelAnimationFrame(camAnim); camNow = null; state.scene = null; state.screenBox = null;
       document.documentElement.appendChild(build());
       window.addEventListener('message', onYtMessage);
       window.addEventListener('keydown', onKey, true);
@@ -855,6 +971,7 @@
       window.removeEventListener('keydown', onKey, true);
       const host = state.host;
       state.host = null; state.iframe = null;
+      cancelAnimationFrame(camAnim);
       if (immediate) { host.remove(); return; }
       host.shadowRoot.querySelector('.backdrop').classList.add('closing');
       setTimeout(() => host.remove(), 220);

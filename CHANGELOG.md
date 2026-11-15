@@ -3,6 +3,12 @@
 All notable changes to CineView. Versions follow [Semantic Versioning](https://semver.org): **MAJOR.MINOR.PATCH**.
 Every version is archived as a ready-to-load zip in [`releases/`](releases/) and tagged in git (`vX.Y.Z`).
 
+## [2.4.6] - 2026-11-15
+- Fixed: on District, every available seat was read as booked, so CineView ignored the seat you picked and showed a "recommended" one. District now hides an "unavailable" icon inside every seat; CineView reads each seat's own label instead (row, printed seat number such as "1A", and whether it's available, booked or selected).
+- Fixed: seat numbers on District could be off by a few (e.g. H9 shown as H12) because the label's column count differs from the printed number. The printed number is used now.
+- Fixed: flickering, a grey frame with black slabs, and an empty side panel in large halls. The hall is now drawn on canvas instead of hundreds of 3D-transformed elements, and the full-page blur behind the preview is replaced by a plain dim.
+- Fixed: "Video player configuration error 153" on the bundled demo page. Extension pages send no referrer, so the demo's trailer now plays through cineview-ten.vercel.app/embed.html.
+
 ## [2.4.5] - 2026-11-14
 - New app icon: a white CinemaScope screen on a red disc, redrawn as vector art so it stays sharp at every size (toolbar, extensions page, Chrome Web Store).
 - Website: matching favicon (SVG, PNG and ICO) and an Apple touch icon.

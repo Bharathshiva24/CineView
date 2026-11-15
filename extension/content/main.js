@@ -234,9 +234,10 @@
   // ---------- open / close ----------
   async function openPreview() {
     if (CV.Overlay.isOpen()) { CV.Overlay.close(); return; }
-    // Canvas seat maps (BookMyShow's newer layout) first, then the DOM reader
+    // Canvas seat maps (BookMyShow's newer layout) first, then seats that label themselves (District), then the DOM reader
     let layout = null;
     try { layout = await CV.detectKonvaLayout(); } catch (_) { layout = null; }
+    if (!layout) { try { layout = CV.detectAriaLayout(); } catch (_) { layout = null; } }
     if (!layout) layout = CV.detectLayout();
     let message = '';
     if (!layout) {
